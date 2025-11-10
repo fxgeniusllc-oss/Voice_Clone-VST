@@ -1,0 +1,67 @@
+# Build directories
+build/
+cmake-build-*/
+Build/
+Builds/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+CTestTestfile.cmake
+_deps/
+
+# Compiled files
+*.o
+*.obj
+*.so
+*.dylib
+*.dll
+*.a
+*.lib
+*.exp
+*.pdb
+*.ilk
+
+# JUCE artifacts
+JuceLibraryCode/
+*_artefacts/
+
+# Plugin formats
+*.vst3
+*.component
+*.aaxplugin
+
+# Temporary files
+*.log
+*.tmp
+tmp/
+temp/
+
+# User-specific files
+*.user
+*.suo
+*.vcxproj.user
+*.suo
+
+# Output directories
+out/
+bin/
+lib/
+Debug/
+Release/
+RelWithDebInfo/
+MinSizeRel/
+
+# Package managers
+node_modules/
+.npm/
