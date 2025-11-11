@@ -1,10 +1,53 @@
-# Build directories
-build/
-cmake-build-*/
-Build/
-Builds/
+# ONNX Model Files - Never commit compiled models
+*.onnx
 
-# IDE files
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+
+# Build artifacts
+Build/
+build/
+*.vst3
+*.component
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+
+# IDE
 .vscode/
 .idea/
 *.swp
@@ -12,56 +55,62 @@ Builds/
 *~
 .DS_Store
 
-# CMake
-CMakeCache.txt
-CMakeFiles/
-cmake_install.cmake
-install_manifest.txt
-CTestTestfile.cmake
-_deps/
-
-# Compiled files
+# Compiled Object files
 *.o
 *.obj
-*.so
-*.dylib
-*.dll
-*.a
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Static libraries
 *.lib
-*.exp
+*.a
+*.la
+*.lo
+
+# Executables
+*.out
+*.app
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
 *.pdb
-*.ilk
 
-# JUCE artifacts
-JuceLibraryCode/
-*_artefacts/
-
-# Plugin formats
-*.vst3
-*.component
-*.aaxplugin
+# Logs
+*.log
 
 # Temporary files
-*.log
-*.tmp
 tmp/
 temp/
+*.tmp
 
-# User-specific files
-*.user
-*.suo
-*.vcxproj.user
-*.suo
+# JUCE
+JuceLibraryCode/
+Builds/
 
-# Output directories
-out/
-bin/
-lib/
-Debug/
-Release/
-RelWithDebInfo/
-MinSizeRel/
+# Platform specific
+Thumbs.db
+Desktop.ini
 
-# Package managers
+# Audio files (large)
+*.wav
+*.mp3
+*.flac
+*.aiff
+*.ogg
+
+# Model training artifacts
+checkpoints/
+tensorboard/
+wandb/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Package manager
 node_modules/
-.npm/
+package-lock.json

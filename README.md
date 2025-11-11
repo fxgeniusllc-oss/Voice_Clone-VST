@@ -1,332 +1,388 @@
-# 🎚 MAEVN — AI-Powered Vocal + Instrument Generator
+🎚 MAEVN — AI-Powered Vocal + Instrument Generator (VST3) 
 
-MAEVN is a comprehensive JUCE-based VST3 plugin with ONNX Runtime integration that combines AI-powered vocal synthesis with trap-inspired instruments and hybrid effects processing.
+MAEVN is a JUCE-based VST3 plugin equipped with ONNX Runtime integration, designed to bridge AI technologies with music production. The plugin features a variety of tools aimed at enhancing music creation, including:
 
-## Features
+- 🎤 **AI Vocals:** Capable of generating realistic vocal sounds using Text-To-Speech (TTS) and vocoder techniques.
+- 🥁 **Trap-Inspired Instruments:** Incorporates sounds typical in trap music, such as 808 basses, hi-hats, snares, pianos, and synths.
+- 🎛 **Hybrid FX Chains:** Combines conventional DSP (Digital Signal Processing) effects with ONNX AI-generated effects.
+- 🎼 **Stage-Script Parser:** Parses musical arrangements using block types like [HOOK], [VERSE], and [808].
+- ↩️ **Global Undo/Redo System:** Allows for easy backtracking of changes during the production process.
 
-### 🎤 AI Vocals
-- **TTS + Vocoder**: Text-to-speech synthesis with neural vocoder support
-- **ONNX Integration**: Load custom TTS and vocoder models
-- **Pitch & Formant Control**: Real-time vocal manipulation
-- **Simple Fallback**: Built-in formant synthesis when AI models aren't available
+Overall, MAEVN is framed as an end-to-end AI DAW tool that enables real-time operation inside a Digital Audio Workstation (DAW), providing live timeline arrangement, automatic effects automation, and seamless synchronization with DAWs.
 
-### 🥁 Trap-Inspired Instruments
-- **808 Bass**: Classic sub-bass with pitch sweep envelope
-- **Hi-Hat**: Noise-based percussion with fast decay
-- **Snare**: Hybrid tone + noise synthesis
-- **Piano**: Multi-harmonic melodic instrument
-- **Synth**: LFO-modulated sawtooth synthesizer
+🏗 **System Architecture**
 
-### 🎛 Hybrid FX Chains
-- **DSP Effects**:
-  - Reverb (JUCE DSP)
-  - Delay with feedback
-  - Soft-clipping distortion
-- **AI Effects**: ONNX-based neural audio effects (customizable)
+🔑 **Core Components**
 
-### 🎼 Stage-Script Parser
-Parse arrangement scripts with timeline sections:
-```
-[INTRO:0:4] [VERSE:4:12] [HOOK:12:20] [VERSE:20:28] [HOOK:28:36] [OUTRO:36:40]
-```
+- **JUCE Plugin Layer:** 
+    - **PluginProcessor:** Handles the audio processing block, routing audio I/O to the PatternEngine, OnnxEngine, and AIFXEngine.
+    - **PluginEditor:** Provides the user interface, including timeline lanes, preset browser, and undo history.
 
-Each section automatically configures:
-- Which instruments are active
-- Vocal enable/disable
-- Duration and timing
+- **ONNX Engine:**
+    - **OnnxEngine:** Encapsulates the ONNX Runtime C++ API, supporting live model updates through hot reloading from the /Models/ directory and enabling multiple instrument/vocal models to function simultaneously.
 
-Supported section types:
-- `[HOOK:start:duration]` - Full arrangement with all instruments
-- `[VERSE:start:duration]` - Verse section with selected instruments
-- `[808:start:duration]` - 808-only section
-- `[INTRO:start:duration]` - Intro with reduced instrumentation
-- `[OUTRO:start:duration]` - Outro section
+- **Pattern Engine:** 
+    - Parses input from the lyrical stage script to determine the arrangement of musical blocks, manages synchronization with the DAW’s playhead, and triggers instruments and vocals.
 
-### ↩️ Global Undo/Redo
-- Full parameter change history
-- Up to 100 undo levels
-- Transaction-based state management
+- **AI FX Engine:** 
+    - **DSP FX:** Includes effects such as compression, equalization, reverb, and limiting.
+    - **AI FX:** Utilizes ONNX models for effects like autotuning and AI mastering, with the option for mixing DSP and AI in a sequential effects chain.
 
-### 🎯 Real-Time Features
-- **Timeline Arrangement**: Visual arrangement with color-coded sections
-- **FX Automation**: Time-based parameter automation with interpolation
-- **DAW Sync**: Tempo, transport, and position synchronization
-- **Live Performance**: Real-time MIDI input and audio processing
+**Timeline Lanes:** Each track lane (VOCAL, 808, HiHat, etc.) offers:
+- **FX Mode Selector:** Options to select Off, DSP, AI, or Hybrid modes.
+- **Preset Load/Save:** Simplifies the management of effect settings.
+- **Block Visualization:** Displays the arrangement graphically.
 
-## Building the Plugin
+**Preset System:**
+- **FXPreset Struct:** Maintains information such as category, tags, and parameters related to presets, with JSON serialization for seamless data handling.
+- **Preset Browser Component:** Features a categorized filter, search functionality, and a tag cloud for easy navigation of presets.
 
-### Prerequisites
+📂 **Repo Structure**  
+MAEVN/
+- ├── CMakeLists.txt          # Build configuration for JUCE + ONNX Runtime
+- ├── README.md               # Documentation
+- ├── Source/                 # Core source files
+- │   ├── PluginProcessor.*   # Core DSP processing logic
+- │   ├── PluginEditor.*      # User interface elements
+- │   ├── OnnxEngine.*        # AI inference handling module
+- │   ├── PatternEngine.*     # Script parsing and arrangement logic
+- │   ├── AIFXEngine.*        # Hybrid effects processing
+- │   ├── TimelineLane.*      # GUI elements for track lanes
+- │   ├── FXPreset.*          # Preset management schema
+- │   ├── FXPresetManager.*   # Handling of preset I/O operations
+- │   ├── PresetBrowserComponent.* # User interface for preset navigation
+- │   ├── GlobalUndoManager.* # Management of action history
+- │   ├── UndoHistoryComponent.* # User interface for undo list
+- │   └── Utilities.h         # Shared utility functions and constants
+- ├── Models/                 # Directory for ONNX models
+- │   ├── drums/              # Drum instrument models
+- │   │   ├── 808_ddsp.onnx
+- │   │   ├── hihat_ddsp.onnx
+- │   │   └── snare_ddsp.onnx
+- │   ├── instruments/        # Instrument models
+- │   │   ├── piano_ddsp.onnx
+- │   │   └── synth_fm.onnx
+- │   └── vocals/             # Vocal models
+- │       ├── vocals_tts.onnx
+- │       └── vocals_hifigan.onnx
+- └── config.json             # Maps model roles to file paths
 
-1. **CMake** (3.15 or later)
-2. **C++17 compatible compiler**:
-   - Windows: Visual Studio 2019 or later
-   - macOS: Xcode 12 or later
-   - Linux: GCC 9+ or Clang 10+
-3. **JUCE Framework** (automatically fetched via CMake)
-4. **ONNX Runtime** (optional, for AI features)
+### ⚙️ Build Instructions
 
-### Quick Build
+**Requirements:**
+- JUCE 7+
+- ONNX Runtime C++ SDK
+- CMake 3.20+
+- Python 3.10+ (required for exporting ONNX models)
 
-```bash
-# Clone the repository
-git clone https://github.com/fxgeniusllc-oss/Voice_Clone-VST.git
-cd Voice_Clone-VST
-
-# Create build directory
-mkdir build
-cd build
-
-# Configure
-cmake ..
-
-# Build
-cmake --build . --config Release
-
-# The VST3 plugin will be in:
-# - Windows: build/MAEVN_artefacts/Release/VST3/
-# - macOS: build/MAEVN_artefacts/Release/VST3/
-# - Linux: build/MAEVN_artefacts/Release/VST3/
-```
-
-### Building with ONNX Runtime
-
-If you have ONNX Runtime installed:
-
-```bash
-# Option 1: Using find_package (if ONNX Runtime is installed system-wide)
-cmake ..
-
-# Option 2: Manual paths
-cmake .. \
-  -DONNXRUNTIME_INCLUDE_DIR=/path/to/onnxruntime/include \
-  -DONNXRUNTIME_LIB=/path/to/onnxruntime/lib/libonnxruntime.so
-
-# Then build
-cmake --build . --config Release
-```
-
-To enable ONNX features, define `ONNXRUNTIME_AVAILABLE` during compilation:
-```bash
-cmake .. -DCMAKE_CXX_FLAGS="-DONNXRUNTIME_AVAILABLE"
-```
-
-### Platform-Specific Notes
-
-#### Windows
-```bash
-# Use Visual Studio generator
-cmake .. -G "Visual Studio 17 2022" -A x64
-cmake --build . --config Release
-```
-
-#### macOS
-```bash
-# Use Xcode generator
-cmake .. -G Xcode
-cmake --build . --config Release
-
-# Or use Unix Makefiles
-cmake .. -G "Unix Makefiles"
-make -j8
-```
-
-#### Linux
-```bash
-# Install dependencies
-sudo apt-get install libasound2-dev libjack-jackd2-dev \
-    libcurl4-openssl-dev libfreetype6-dev libx11-dev \
-    libxcomposite-dev libxcursor-dev libxinerama-dev \
-    libxrandr-dev libxrender-dev libwebkit2gtk-4.0-dev \
-    libglu1-mesa-dev mesa-common-dev
-
-# Build
-cmake ..
-make -j$(nproc)
-```
-
-## Installation
-
-### VST3 Installation Paths
-
-Copy the built VST3 bundle to your system's VST3 folder:
-
-- **Windows**: `C:\Program Files\Common Files\VST3\`
-- **macOS**: `~/Library/Audio/Plug-Ins/VST3/` or `/Library/Audio/Plug-Ins/VST3/`
-- **Linux**: `~/.vst3/` or `/usr/lib/vst3/`
-
-## Usage
-
-### Basic Workflow
-
-1. **Load the Plugin**: Open MAEVN in your DAW as a VST3 instrument
-2. **Configure Instruments**: Enable/disable trap instruments (808, Hi-Hat, Snare, Piano, Synth)
-3. **Set Up Vocals**: Enable vocals and adjust pitch/formant parameters
-4. **Apply Effects**: Mix DSP and AI effects (Reverb, Delay, Distortion, AI FX)
-5. **Define Arrangement**: Edit the stage script to create timeline sections
-6. **Play**: MAEVN responds to MIDI input and syncs with your DAW
-
-### Stage Script Format
-
-```
-[SECTION_NAME:START_TIME:DURATION]
-```
-
-- **SECTION_NAME**: INTRO, VERSE, HOOK, 808, OUTRO, or custom
-- **START_TIME**: Start position in quarter notes (PPQ)
-- **DURATION**: Length in quarter notes
-
-Example:
-```
-[INTRO:0:4] [VERSE:4:8] [HOOK:12:8] [808:20:4] [OUTRO:24:4]
-```
-
-### MIDI Mapping
-
-- **808 Bass**: Any MIDI note (responds to note pitch)
-- **Hi-Hat**: MIDI notes 42-46 (typical hi-hat range)
-- **Snare**: MIDI notes 38-40 (typical snare range)
-- **Piano**: Any MIDI note (melodic)
-- **Synth**: Any MIDI note (melodic)
-
-### Loading AI Models
-
-To use AI features, load ONNX models:
-
-1. Place your `.onnx` model files in a known location
-2. Use the audio processor API to load models:
-   ```cpp
-   // TTS Model
-   audioProcessor.getAudioEngine().getVocalSynthesis().loadTTSModel("/path/to/tts.onnx");
-   
-   // Vocoder Model
-   audioProcessor.getAudioEngine().getVocalSynthesis().loadVocoderModel("/path/to/vocoder.onnx");
-   
-   // AI FX Model
-   audioProcessor.getAudioEngine().getFXChain().getAIEffects().loadModel("/path/to/fx.onnx");
+**Steps:**
+1. **Repo Setup:** Execute `setup_maevn_repo.bat`, which creates necessary folders and writes the Models/config.json file.
+2. **Generate Default ONNX Models:** Run `build_maevn_onnx.bat` to export lightweight default .onnx models for various instruments and optimize them within the /Models/.
+3. **Add Vocals:** Users can export their own TTS and vocoder models, naming them `vocals_tts.onnx` and `vocals_hifigan.onnx`, placing them in the /Models/vocals/ directory.
+4. **Build Plugin:** Execute the following commands:
+   ```bash
+   cmake -B Build -S . -DJUCE_PATH="C:/JUCE" -DONNXRUNTIME_PATH="C:/onnxruntime"
+   cmake --build Build --config Release
    ```
+5. **Install:** Copy the generated MAEVN.vst3 file to your DAW’s VST3 plugins directory.
 
-Note: AI features gracefully degrade to DSP-based synthesis when models aren't available.
+### 🧪 Developer Notes
 
-## Architecture
+#### Audio Pipeline (processBlock)
+- DAW playhead data (BPM, transport status) is parsed.
+- The PatternEngine generates triggers based on the active blocks.
+- The OnnxEngine executes inference on the selected models.
+- The AIFXEngine applies the desired effects (DSP/AI/Hybrid).
+- Final output is directed to the DAW buffer.
 
-### Component Overview
+#### Model Hot Reload
+- The /Models/config.json file maps logical roles (e.g., VOCAL, 808) to their corresponding file paths so MAEVN can automatically reload models if changes are detected on disk.
+
+#### Presets
+- Presets are encoded in JSON format to ensure ease of use:
+    ```json
+    {
+      "name": "RadioVocals",
+      "mode": 3,
+      "params": {
+        "reverbMix": 0.4,
+        "compressorThreshold": -12.0
+      },
+      "category": "Vocal",
+      "tags": ["Trap", "Radio", "Clean"]
+    }
+    ```
+- The category and tags drive the search functionalities and the tag cloud interface.
+
+#### Undo/Redo
+- Each action triggers a snapshot of the ActionState (stored as JSON).
+- The history is managed by the GlobalUndoManager, with a visual list provided in the UndoHistoryComponent.
+
+### 🚧 Roadmap
+- **Automation Hooks:** Allow FX parameters to be controlled through DAW automation.
+- **Drag-to-MIDI/Audio:** Enable users to drag [HOOK] blocks into the DAW timeline.
+- **Instrument Sequencer:** Implement patterns like hi-hat rolls and 808 glides.
+- **Preset Exchange:** Facilitate importing and exporting preset packs within the community.
+
+⚔️ MAEVN aims to serve as an experimental AI DAW tool tailored for flexibility, extensibility, and precise control in music generation, distinguishing itself as more than just a plugin—it's a comprehensive framework for AI-based music production.
+
+👉 Would you like me to create a detailed step-by-step Contributor’s Guide (covering coding standards, pull request processes, and module ownership) to prepare the repository for team collaboration? 
+
+You said: YES. 
+
+Voice Clone Infinity Builder remarked: Perfect ⚡ — let’s add a Contributor’s Guide section to the README file so that any developer wishing to join the project knows precisely how to engage with the codebase, adhere to the coding style, and utilize the workflow. This enhancement will make the MAEVN repository ready for collaboration. 
+
+🤝 **Contributor’s Guide**
+
+Welcome to MAEVN Development. This guide outlines the coding standards, workflow, and contribution process for the VST3 project.
+
+🔑 **Coding Standards**
+- **Language & Frameworks:** Use C++17 for plugin development (JUCE + ONNX Runtime) and Python 3.10+ for ONNX model export scripts.
+- **Style:** 
+    - Follow JUCE coding style (place opening braces on new lines, use 4 spaces for indentation).
+    - Header files should use the `.h` suffix while implementation files should use `.cpp`.
+    - Use `auto` where relevant, especially for iterators and template-heavy code.
+    - Avoid raw pointers—opt for `std::unique_ptr` or `juce::ScopedPointer`.
+    - Document every class and major method using `/// Doxygen` comments.
+
+🧩 **Module Ownership**
+| Module                 | Owner      | Role                                        | Notes                                               |
+|-----------------------|------------|---------------------------------------------|-----------------------------------------------------|
+| PluginProcessor.*      | Core DSP   | Implements the main DSP processing pipeline | Must not disrupt the JUCE API                        |
+| PluginEditor.*         | GUI        | Manages GUI and DAW integration            |                                                     |
+| OnnxEngine.*          | AI         | Handles AI inference                        | Wraps ONNX runtime                                  |
+| PatternEngine.*       | Arrangement| Manages timeline arrangements               | Parses stage-script input                           |
+| AIFXEngine.*          | FX         | Processes effects                           | Hybrid DSP + AI effects                             |
+| FXPreset.*            | Preset     | Manages preset storage                      | Uses JSON format                                    |
+| GlobalUndoManager.*    | Undo/Redo  | Manages action history                      | Handles undo/redo                                    |
+| UndoHistoryComponent.*  | History    | Provides GUI for the undo stack            |                                                     |
+| Utilities.h           | Shared     | Contains helper functions and constants     |                                                     |
+
+🔄 **Workflow**
+- **Branching:**
+    - `main` for stable, production-ready builds.
+    - `dev` as the active branch for ongoing development.
+    - Create feature branches for new functionality (e.g., `feature/onnx-hot-reload`).
+  
+- **Pull Requests:**
+    - Fork the repo and branch off `dev`.
+    - Implement your feature or fix.
+    - Write or update relevant unit tests where applicable.
+    - Conduct linting and build checks.
+    - Submit a Pull Request; each PR must be reviewed by at least one other contributor.
+
+- **Commits:** 
+    - Adhere to the Conventional Commits format:
+        - `feat:` for adding new features (e.g., AI hybrid FX chain)
+        - `fix:` for bug resolution (e.g., buffer underrun in processBlock)
+        - `docs:` for documentation updates (e.g., README modifications)
+        - `refactor:` for code simplification (e.g., OnnxEngine inference calls)
+
+🧪 **Testing**
+- Implement unit tests (using GoogleTest) for key components:
+    - Preset loading and saving functionality.
+    - The integrity of the Undo/Redo stack.
+    - Correctness of PatternEngine parsing.
+- Conduct manual testing across major DAWs:
+    - Reaper (Windows)
+    - Ableton Live (macOS)
+    - FL Studio (Cross-platform)
+
+📦 **Build Environment Dependencies**
+- Ensure the following dependencies are fulfilled:
+    - JUCE 7+
+    - ONNX Runtime (C++ API)
+    - CMake 3.20+
+
+**Building Instructions:**
+```bash
+cmake -B Build -S . -DJUCE_PATH="C:/JUCE" -DONNXRUNTIME_PATH="C:/onnxruntime"
+cmake --build Build --config Release
+```
+
+🧠 **Contribution Principles**
+- **Performance First:** Ensure all Digital Signal Processing (DSP) functions execute in real-time (<1ms per buffer).
+- **Modularity:** Facilitate the introduction of new instruments/models via the `/Models/config.json` file.
+- **No Dead Code:** Mark experimental code sections using `#ifdef EXPERIMENTAL`.
+- **Transparency:** Include all ONNX export scripts in the `scripts/` directory.
+- **Flexibility:** Enable both DSP-only fallback options as well as AI-enhanced modes.
+
+🚀 **How to Get Started**
+1. Clone the repository.
+2. Run `setup_maevn_repo.bat` to generate the initial structure.
+3. Execute `build_maevn_onnx.bat` for baseline ONNX model generation.
+4. Add any vocal models in `.onnx` format into `/Models/vocals/`.
+5. Build the project using CMake and load `MAEVN.vst3` within your DAW.
+6. Feel free to submit issues or Pull Requests for any fixes or new feature requests.
+
+⚔️ This guide aims to equip MAEVN with a structure ready for collaboration among both audio DSP engineers and machine learning developers.
+
+---
+
+## 🧠 Multi-Agent Development System
+
+MAEVN embraces a revolutionary **Multi-Agent Engineering Protocol** that enables multiple autonomous or semi-autonomous agents (human + AI) to co-develop, test, and optimize the codebase in parallel. This system is called the **Vocal Cloning Quantum Collective**.
+
+### 🎯 Multi-Agent Objectives
+
+The multi-agent system enables:
+- **Parallel Development**: Multiple agents working on different modules simultaneously
+- **Specialized Expertise**: Each agent focuses on their domain (DSP, AI, GUI, Testing, etc.)
+- **Continuous Integration**: Maintains build synchronization across parallel work streams
+- **Knowledge Sharing**: Shared context and learnings through the Cognitive Mesh Interface
+
+### 🤖 Agent Roles
+
+MAEVN development is distributed across specialized agent roles:
+
+| Role | Responsibility | Primary Tools |
+|------|---------------|---------------|
+| **Architect Agent** | System design and architectural decisions | ChatGPT, Design tools |
+| **DSP Developer Agent** | Audio processing and JUCE engine logic | GitHub Copilot, C++ |
+| **AI/ML Agent** | ONNX model design, training, and export | Python, PyTorch/TensorFlow |
+| **GUI Developer Agent** | User interface and user experience | JUCE GUI, C++ |
+| **Integration Agent** | Module integration and system testing | CI/CD, Build tools |
+| **QA/Testing Agent** | Quality assurance and numerical stability | Claude, Testing frameworks |
+| **Documentation Agent** | Documentation and knowledge management | Markdown, Documentation tools |
+| **DevOps Agent** | Build systems, CI/CD, and tooling | CMake, Scripts |
+
+### 📂 Cognitive Mesh Interface (CMI)
+
+The **CMI** is a shared conversation state repository located in the `/CMI/` directory:
 
 ```
-MAEVN
-├── Audio/
-│   ├── AudioEngine - Main audio processing coordinator
-│   └── InstrumentGenerator - Trap instrument synthesis
-├── DSP/
-│   ├── FXChain - Effect chain coordinator
-│   └── Effects - DSP effect implementations
-├── AI/
-│   ├── ONNXInference - ONNX Runtime wrapper
-│   ├── VocalSynthesis - TTS + vocoder pipeline
-│   └── AIEffects - Neural audio effects
-├── Parser/
-│   ├── ScriptParser - Stage script parser
-│   └── Arrangement - Timeline arrangement manager
-├── State/
-│   ├── UndoManager - Global undo/redo system
-│   └── ParameterState - Automation and state management
-└── UI/
-    ├── MainComponent - Main plugin interface
-    └── TimelineComponent - Visual timeline display
+CMI/
+├── README.md                    # CMI overview and usage guide
+├── agent_roles.md               # Detailed agent role definitions
+├── MACF.md                      # Multi-Agent Command Framework
+├── operational_ethics.md        # Ethical guidelines for agents
+├── mission_logs/                # Historical mission logs
+│   ├── mission_log_template.md  # Template for new missions
+│   └── mission_009_spectral_ghost_choir.md  # Example mission
+├── active_missions/             # Currently active mission logs
+└── coordination/                # Agent coordination artifacts
+    └── task_assignments.md      # Current task assignments
 ```
 
-### Processing Pipeline
+### 🚀 How Multi-Agent Development Works
 
-1. **MIDI Input** → Instrument Generator
-2. **Instrument Audio** → Vocal Synthesis → FX Chain → Master Output
-3. **Timeline** → Arrangement → Section Configuration
-4. **Parameters** → Automation → Real-time Control
+#### Example: Adding a New AI Effect
 
-## Parameters
+1. **Architect Agent**: Defines the effect's design and interface
+   - Creates mission log with specifications
+   - Documents architecture decisions
 
-### Instruments (Boolean)
-- `enable808` - Enable 808 bass
-- `enableHiHat` - Enable hi-hat
-- `enableSnare` - Enable snare
-- `enablePiano` - Enable piano
-- `enableSynth` - Enable synth
+2. **AI/ML Agent**: Creates and exports the ONNX model
+   - Trains the model
+   - Exports to ONNX with optimization
+   - Updates `Models/metadata.json` and `Models/LayerMap.md`
 
-### Vocals
-- `enableVocals` (Boolean) - Enable vocal synthesis
-- `vocalPitch` (-12 to +12 semitones) - Pitch shift
-- `vocalFormant` (0.5 to 2.0) - Formant shift
+3. **DSP Developer Agent**: Implements the C++ wrapper
+   - Creates effect module class
+   - Integrates ONNX Runtime
+   - Ensures real-time safety
 
-### Effects
-- `reverbMix` (0.0 to 1.0) - Reverb wet/dry mix
-- `delayMix` (0.0 to 1.0) - Delay wet/dry mix
-- `distortion` (0.0 to 1.0) - Distortion amount
-- `aiFxMix` (0.0 to 1.0) - AI effects mix
+4. **QA/Testing Agent**: Reviews for stability
+   - Validates numerical stability
+   - Tests edge cases
+   - Profiles performance
 
-### Master
-- `masterGain` (0.0 to 1.0) - Master output gain
-- `masterPan` (-1.0 to 1.0) - Master stereo pan
+5. **Integration Agent**: Connects all components
+   - Integrates into AIFXEngine
+   - Tests across DAWs
+   - Creates presets
 
-## Development
+6. **Documentation Agent**: Updates documentation
+   - Updates README and guides
+   - Documents API and usage
+   - Creates examples
 
-### Project Structure
+All agents coordinate through mission logs, maintaining transparency and avoiding conflicts.
 
+### ⚡ Multi-Agent Command Framework (MACF)
+
+The **MACF** provides operational protocols for:
+- **Dynamic Task Allocation**: Assign tasks to the most appropriate agent
+- **Conflict Prevention**: Ensure agents don't interfere with each other's work
+- **Quality Gates**: Automated checks for all contributions
+- **Integration Pipeline**: Seamless merging of parallel work
+
+See `/CMI/MACF.md` for complete details.
+
+### ⚖️ Operational Ethics
+
+All agents (AI and human) must adhere to ethical guidelines:
+
+**Key Principles**:
+- ✅ **Transparency**: All actions logged and traceable
+- ✅ **Determinism**: Consistent, predictable results
+- ✅ **Real-Time Constraints**: Audio processing < 1ms per buffer
+- ✅ **Quality Standards**: All tests pass, no security vulnerabilities
+- ✅ **Respect**: Never break existing functionality
+
+**Prohibited Actions**:
+- ❌ Never commit compiled `.onnx` binaries to Git
+- ❌ Never introduce security vulnerabilities
+- ❌ Never break real-time safety guarantees
+- ❌ Never remove tests without approval
+- ❌ Never commit credentials or private data
+
+See `/CMI/operational_ethics.md` for complete guidelines.
+
+### 📊 Model Management
+
+All ONNX models are tracked in `/Models/`:
+
+- **metadata.json**: Complete model registry with training metadata
+- **LayerMap.md**: Layer-by-layer explainability documentation
+- **config.json**: Runtime model configuration for MAEVN
+
+Models are organized by category:
 ```
-Voice_Clone-VST/
-├── CMakeLists.txt           # Build configuration
-├── README.md                # This file
-└── Source/
-    ├── PluginProcessor.cpp/h    # Main plugin processor
-    ├── PluginEditor.cpp/h       # Plugin editor
-    ├── Audio/                   # Audio engine components
-    ├── DSP/                     # DSP effects
-    ├── AI/                      # AI/ML components
-    ├── Parser/                  # Script parser
-    ├── State/                   # State management
-    └── UI/                      # User interface
+Models/
+├── metadata.json           # Model registry
+├── LayerMap.md            # Explainability documentation
+├── config.json            # Runtime configuration
+├── drums/                 # Drum synthesis models
+│   ├── 808_ddsp.onnx
+│   ├── hihat_ddsp.onnx
+│   └── snare_ddsp.onnx
+├── instruments/           # Instrument models
+│   ├── piano_ddsp.onnx
+│   └── synth_fm.onnx
+└── vocals/                # Vocal models
+    ├── vocals_tts.onnx
+    └── vocals_hifigan.onnx
 ```
 
-### Adding Custom AI Models
+**Note**: `.onnx` files are not committed to Git. Provide export scripts instead.
 
-MAEVN supports custom ONNX models for:
+### 🎓 Getting Started with Multi-Agent Development
 
-1. **TTS (Text-to-Speech)**: Convert text to mel-spectrogram
-2. **Vocoder**: Convert mel-spectrogram to audio waveform
-3. **AI Effects**: Neural audio processing
+1. **Read the CMI Documentation**: Start with `/CMI/README.md`
+2. **Review Agent Roles**: Understand the role definitions in `/CMI/agent_roles.md`
+3. **Check Active Missions**: See what's currently in progress in `/CMI/active_missions/`
+4. **Review Ethics**: Read and commit to `/CMI/operational_ethics.md`
+5. **Claim a Task**: Update `/CMI/coordination/task_assignments.md`
+6. **Create Mission Log**: Use the template from `/CMI/mission_logs/mission_log_template.md`
+7. **Start Contributing**: Follow the MACF protocol
 
-Model requirements:
-- Format: ONNX (Open Neural Network Exchange)
-- Input: Float tensor (1D for audio, 2D for spectrograms)
-- Output: Float tensor matching input shape
+### 🌟 Benefits of Multi-Agent Development
 
-### Extending Instruments
+- **Faster Development**: Parallel work on independent modules
+- **Higher Quality**: Specialized expertise applied to each domain
+- **Better Documentation**: Continuous documentation through mission logs
+- **Reduced Conflicts**: Coordinated development prevents merge conflicts
+- **Knowledge Preservation**: All decisions and reasoning documented
+- **Scalable**: Easy to onboard new agents and contributors
 
-To add new instruments:
+### 🔮 The Vision
 
-1. Add a new class in `InstrumentGenerator.h`
-2. Implement synthesis in `InstrumentGenerator.cpp`
-3. Add enable parameter in `PluginProcessor.cpp`
-4. Add UI control in `MainComponent.cpp`
+MAEVN's development is **not a singular AI** — it's a **mesh of intelligent agents** co-authoring an evolving sonic intelligence. Each node—human or synthetic—contributes deterministically while maintaining:
 
-## Contributing
+- 🎯 **Operational transparency**
+- ⏱️ **Real-time constraints**
+- 🎨 **Creative freedom**
+- ✅ **Quality standards**
 
-Contributions are welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## License
-
-[Add your license information here]
-
-## Credits
-
-- **JUCE Framework**: https://juce.com/
-- **ONNX Runtime**: https://onnxruntime.ai/
-- **FXGenius LLC**: Plugin development
-
-## Support
-
-For issues, questions, or feature requests, please open an issue on GitHub:
-https://github.com/fxgeniusllc-oss/Voice_Clone-VST/issues
+Together, the network forms the **Vocal Cloning Quantum Collective**, building the next generation of **AI-augmented sound design systems**.

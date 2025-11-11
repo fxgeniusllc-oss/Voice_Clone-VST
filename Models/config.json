@@ -1,0 +1,72 @@
+{
+  "version": "1.0",
+  "description": "MAEVN Model Configuration - Maps logical roles to ONNX model file paths",
+  "last_updated": "2025-01-15T00:00:00Z",
+  "model_roles": {
+    "VOCAL_TTS": {
+      "display_name": "Vocal TTS",
+      "file_path": "Models/vocals/vocals_tts.onnx",
+      "enabled": true,
+      "fallback": "none",
+      "category": "vocals"
+    },
+    "VOCAL_VOCODER": {
+      "display_name": "Vocal Vocoder",
+      "file_path": "Models/vocals/vocals_hifigan.onnx",
+      "enabled": true,
+      "fallback": "none",
+      "category": "vocals"
+    },
+    "DRUM_808": {
+      "display_name": "808 Bass",
+      "file_path": "Models/drums/808_ddsp.onnx",
+      "enabled": true,
+      "fallback": "sine_wave",
+      "category": "drums"
+    },
+    "DRUM_HIHAT": {
+      "display_name": "Hi-Hat",
+      "file_path": "Models/drums/hihat_ddsp.onnx",
+      "enabled": true,
+      "fallback": "noise",
+      "category": "drums"
+    },
+    "DRUM_SNARE": {
+      "display_name": "Snare",
+      "file_path": "Models/drums/snare_ddsp.onnx",
+      "enabled": true,
+      "fallback": "noise",
+      "category": "drums"
+    },
+    "INSTRUMENT_PIANO": {
+      "display_name": "Piano",
+      "file_path": "Models/instruments/piano_ddsp.onnx",
+      "enabled": true,
+      "fallback": "sine_wave",
+      "category": "instruments"
+    },
+    "INSTRUMENT_SYNTH": {
+      "display_name": "FM Synth",
+      "file_path": "Models/instruments/synth_fm.onnx",
+      "enabled": true,
+      "fallback": "sine_wave",
+      "category": "instruments"
+    }
+  },
+  "hot_reload": {
+    "enabled": true,
+    "check_interval_ms": 5000,
+    "description": "Automatically reload models when file changes detected"
+  },
+  "fallback_modes": {
+    "none": "Disable instrument if model not available",
+    "sine_wave": "Use basic sine wave synthesis",
+    "noise": "Use filtered noise synthesis"
+  },
+  "notes": [
+    "This file is monitored for changes - MAEVN will hot-reload models automatically",
+    "Set 'enabled' to false to temporarily disable a model without removing the file",
+    "Fallback modes provide basic DSP synthesis when ONNX models are unavailable",
+    "File paths are relative to the MAEVN plugin directory"
+  ]
+}
