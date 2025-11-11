@@ -216,3 +216,173 @@ cmake --build Build --config Release
 6. Feel free to submit issues or Pull Requests for any fixes or new feature requests.
 
 ⚔️ This guide aims to equip MAEVN with a structure ready for collaboration among both audio DSP engineers and machine learning developers.
+
+---
+
+## 🧠 Multi-Agent Development System
+
+MAEVN embraces a revolutionary **Multi-Agent Engineering Protocol** that enables multiple autonomous or semi-autonomous agents (human + AI) to co-develop, test, and optimize the codebase in parallel. This system is called the **Vocal Cloning Quantum Collective**.
+
+### 🎯 Multi-Agent Objectives
+
+The multi-agent system enables:
+- **Parallel Development**: Multiple agents working on different modules simultaneously
+- **Specialized Expertise**: Each agent focuses on their domain (DSP, AI, GUI, Testing, etc.)
+- **Continuous Integration**: Maintains build synchronization across parallel work streams
+- **Knowledge Sharing**: Shared context and learnings through the Cognitive Mesh Interface
+
+### 🤖 Agent Roles
+
+MAEVN development is distributed across specialized agent roles:
+
+| Role | Responsibility | Primary Tools |
+|------|---------------|---------------|
+| **Architect Agent** | System design and architectural decisions | ChatGPT, Design tools |
+| **DSP Developer Agent** | Audio processing and JUCE engine logic | GitHub Copilot, C++ |
+| **AI/ML Agent** | ONNX model design, training, and export | Python, PyTorch/TensorFlow |
+| **GUI Developer Agent** | User interface and user experience | JUCE GUI, C++ |
+| **Integration Agent** | Module integration and system testing | CI/CD, Build tools |
+| **QA/Testing Agent** | Quality assurance and numerical stability | Claude, Testing frameworks |
+| **Documentation Agent** | Documentation and knowledge management | Markdown, Documentation tools |
+| **DevOps Agent** | Build systems, CI/CD, and tooling | CMake, Scripts |
+
+### 📂 Cognitive Mesh Interface (CMI)
+
+The **CMI** is a shared conversation state repository located in the `/CMI/` directory:
+
+```
+CMI/
+├── README.md                    # CMI overview and usage guide
+├── agent_roles.md               # Detailed agent role definitions
+├── MACF.md                      # Multi-Agent Command Framework
+├── operational_ethics.md        # Ethical guidelines for agents
+├── mission_logs/                # Historical mission logs
+│   ├── mission_log_template.md  # Template for new missions
+│   └── mission_009_spectral_ghost_choir.md  # Example mission
+├── active_missions/             # Currently active mission logs
+└── coordination/                # Agent coordination artifacts
+    └── task_assignments.md      # Current task assignments
+```
+
+### 🚀 How Multi-Agent Development Works
+
+#### Example: Adding a New AI Effect
+
+1. **Architect Agent**: Defines the effect's design and interface
+   - Creates mission log with specifications
+   - Documents architecture decisions
+
+2. **AI/ML Agent**: Creates and exports the ONNX model
+   - Trains the model
+   - Exports to ONNX with optimization
+   - Updates `Models/metadata.json` and `Models/LayerMap.md`
+
+3. **DSP Developer Agent**: Implements the C++ wrapper
+   - Creates effect module class
+   - Integrates ONNX Runtime
+   - Ensures real-time safety
+
+4. **QA/Testing Agent**: Reviews for stability
+   - Validates numerical stability
+   - Tests edge cases
+   - Profiles performance
+
+5. **Integration Agent**: Connects all components
+   - Integrates into AIFXEngine
+   - Tests across DAWs
+   - Creates presets
+
+6. **Documentation Agent**: Updates documentation
+   - Updates README and guides
+   - Documents API and usage
+   - Creates examples
+
+All agents coordinate through mission logs, maintaining transparency and avoiding conflicts.
+
+### ⚡ Multi-Agent Command Framework (MACF)
+
+The **MACF** provides operational protocols for:
+- **Dynamic Task Allocation**: Assign tasks to the most appropriate agent
+- **Conflict Prevention**: Ensure agents don't interfere with each other's work
+- **Quality Gates**: Automated checks for all contributions
+- **Integration Pipeline**: Seamless merging of parallel work
+
+See `/CMI/MACF.md` for complete details.
+
+### ⚖️ Operational Ethics
+
+All agents (AI and human) must adhere to ethical guidelines:
+
+**Key Principles**:
+- ✅ **Transparency**: All actions logged and traceable
+- ✅ **Determinism**: Consistent, predictable results
+- ✅ **Real-Time Constraints**: Audio processing < 1ms per buffer
+- ✅ **Quality Standards**: All tests pass, no security vulnerabilities
+- ✅ **Respect**: Never break existing functionality
+
+**Prohibited Actions**:
+- ❌ Never commit compiled `.onnx` binaries to Git
+- ❌ Never introduce security vulnerabilities
+- ❌ Never break real-time safety guarantees
+- ❌ Never remove tests without approval
+- ❌ Never commit credentials or private data
+
+See `/CMI/operational_ethics.md` for complete guidelines.
+
+### 📊 Model Management
+
+All ONNX models are tracked in `/Models/`:
+
+- **metadata.json**: Complete model registry with training metadata
+- **LayerMap.md**: Layer-by-layer explainability documentation
+- **config.json**: Runtime model configuration for MAEVN
+
+Models are organized by category:
+```
+Models/
+├── metadata.json           # Model registry
+├── LayerMap.md            # Explainability documentation
+├── config.json            # Runtime configuration
+├── drums/                 # Drum synthesis models
+│   ├── 808_ddsp.onnx
+│   ├── hihat_ddsp.onnx
+│   └── snare_ddsp.onnx
+├── instruments/           # Instrument models
+│   ├── piano_ddsp.onnx
+│   └── synth_fm.onnx
+└── vocals/                # Vocal models
+    ├── vocals_tts.onnx
+    └── vocals_hifigan.onnx
+```
+
+**Note**: `.onnx` files are not committed to Git. Provide export scripts instead.
+
+### 🎓 Getting Started with Multi-Agent Development
+
+1. **Read the CMI Documentation**: Start with `/CMI/README.md`
+2. **Review Agent Roles**: Understand the role definitions in `/CMI/agent_roles.md`
+3. **Check Active Missions**: See what's currently in progress in `/CMI/active_missions/`
+4. **Review Ethics**: Read and commit to `/CMI/operational_ethics.md`
+5. **Claim a Task**: Update `/CMI/coordination/task_assignments.md`
+6. **Create Mission Log**: Use the template from `/CMI/mission_logs/mission_log_template.md`
+7. **Start Contributing**: Follow the MACF protocol
+
+### 🌟 Benefits of Multi-Agent Development
+
+- **Faster Development**: Parallel work on independent modules
+- **Higher Quality**: Specialized expertise applied to each domain
+- **Better Documentation**: Continuous documentation through mission logs
+- **Reduced Conflicts**: Coordinated development prevents merge conflicts
+- **Knowledge Preservation**: All decisions and reasoning documented
+- **Scalable**: Easy to onboard new agents and contributors
+
+### 🔮 The Vision
+
+MAEVN's development is **not a singular AI** — it's a **mesh of intelligent agents** co-authoring an evolving sonic intelligence. Each node—human or synthetic—contributes deterministically while maintaining:
+
+- 🎯 **Operational transparency**
+- ⏱️ **Real-time constraints**
+- 🎨 **Creative freedom**
+- ✅ **Quality standards**
+
+Together, the network forms the **Vocal Cloning Quantum Collective**, building the next generation of **AI-augmented sound design systems**.
