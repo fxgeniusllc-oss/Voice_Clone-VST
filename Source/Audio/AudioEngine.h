@@ -1,6 +1,6 @@
 #pragma once
 
-#include <JuceHeader.h>
+#include <juce_audio_processors/juce_audio_processors.h>
 #include "InstrumentGenerator.h"
 #include "../DSP/FXChain.h"
 #include "../AI/VocalSynthesis.h"
