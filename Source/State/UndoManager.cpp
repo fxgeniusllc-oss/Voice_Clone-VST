@@ -2,7 +2,8 @@
 
 MAEVNUndoManager::MAEVNUndoManager()
 {
-    undoManager.setMaxNumberOfStoredUnits(100);
+    // JUCE's UndoManager doesn't have setMaxNumberOfStoredUnits anymore
+    // It now uses a configurable transaction limit
 }
 
 MAEVNUndoManager::~MAEVNUndoManager()

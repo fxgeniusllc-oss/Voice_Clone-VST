@@ -103,3 +103,11 @@ target_compile_definitions(MAEVN
         JUCE_REPORT_APP_USAGE=0
         JUCE_STRICT_REFCOUNTEDPOINTER=1
 )
+
+# Testing
+option(BUILD_TESTS "Build test suite" ON)
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(Tests)
+    message(STATUS "Tests enabled - use 'ctest' to run tests after building")
+endif()
