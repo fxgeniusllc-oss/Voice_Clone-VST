@@ -21,16 +21,40 @@ If you have a pre-built binary:
 
 See [BUILD.md](BUILD.md) for detailed build instructions.
 
-**Quick build:**
+**Quick build and install:**
 ```bash
+# Build
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 cmake --build . --config Release
+
+# Install (installs both VST3 and standalone)
+cd ..
+./install_maevn.sh  # or install_maevn.bat on Windows
 ```
+
+### 3. Using Standalone Mode (No DAW Required)
+
+After building, you can run MAEVN as a standalone application:
+
+**Linux/macOS:**
+```bash
+./launch_maevn.sh
+```
+
+**Windows:**
+```batch
+launch_maevn.bat
+```
+
+Or if you've installed it:
+- **Linux**: Launch from application menu or run `MAEVN`
+- **macOS**: Open from Applications folder
+- **Windows**: Launch from Start Menu
 
 ## First Use
 
-### Loading the Plugin
+### Option A: Loading as VST3 Plugin in DAW
 
 1. Open your DAW (see compatible DAWs listed below)
 2. Create a new MIDI/Instrument track
@@ -50,7 +74,15 @@ cmake --build . --config Release
 **Not Compatible:**
 - ❌ Audacity (does not support VST3 format)
 
+### Option B: Using Standalone Mode
+
 **Alternative:** Use MAEVN in Standalone mode (no DAW required)
+
+Launch MAEVN standalone using the launcher script or from your system's application menu. This mode is perfect for:
+- Quick experimentation
+- Use without a DAW
+- Learning the interface
+- Testing before integrating into your DAW workflow
 
 ### Basic Configuration
 

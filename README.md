@@ -56,12 +56,17 @@ cd Voice_Clone-VST
 # 3. Export default ONNX models (optional, requires Python 3.10+)
 ./build_maevn_onnx.sh  # or build_maevn_onnx.bat on Windows
 
-# 4. Build plugin
+# 4. Build plugin and standalone
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 cmake --build . --config Release
 
-# 5. Install (plugin will be in build/MAEVN_artefacts/Release/VST3/)
+# 5. Install standalone app and VST3 plugin
+cd ..
+./install_maevn.sh  # or install_maevn.bat on Windows
+
+# 6. Launch standalone (or use from DAW as VST3)
+./launch_maevn.sh  # or launch_maevn.bat on Windows
 ```
 
 See [BUILD.md](BUILD.md) for detailed build instructions.
@@ -171,12 +176,16 @@ Voice_Clone-VST/
 ├── BUILD.md                          # Detailed build instructions
 ├── ARCHITECTURE.md                   # System architecture documentation
 ├── QUICKSTART.md                     # Quick start guide for users
+├── LAUNCHER_GUIDE.md                 # Launcher and installation guide
 ├── CONTRIBUTING.md                   # Contribution guidelines
 ├── LICENSE                           # MIT License
 ├── .gitignore                        # Git ignore rules
 │
 ├── setup_maevn_repo.sh/.bat         # Repository setup scripts
 ├── build_maevn_onnx.sh/.bat         # ONNX model export scripts
+├── install_maevn.sh/.bat            # Installation scripts (VST3 + Standalone)
+├── launch_maevn.sh/.bat             # Standalone launcher scripts
+├── maevn.desktop                    # Linux desktop entry file
 │
 ├── Source/                           # Core source files
 │   ├── PluginProcessor.*             # Core DSP processing logic
@@ -459,7 +468,8 @@ See [CMI/operational_ethics.md](CMI/operational_ethics.md) for complete guidelin
 - **[README.md](README.md)** — This file (overview and quick start)
 - **[BUILD.md](BUILD.md)** — Detailed build instructions for all platforms
 - **[ARCHITECTURE.md](ARCHITECTURE.md)** — System architecture and design
-- **QUICKSTART.md** — User quick start guide _(planned; to be added)_
+- **[QUICKSTART.md](QUICKSTART.md)** — User quick start guide
+- **[LAUNCHER_GUIDE.md](LAUNCHER_GUIDE.md)** — Launcher and installation guide
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** — Contribution guidelines
 - **[TESTING.md](TESTING.md)** — Testing guidelines and practices
 - **[CMI/README.md](CMI/README.md)** — Multi-agent development system
