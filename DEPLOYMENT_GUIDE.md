@@ -25,7 +25,22 @@
 - CPU: Dual-core 2.0 GHz
 - RAM: 4 GB
 - OS: Windows 10+, macOS 10.13+, or Linux (Ubuntu 20.04+)
-- DAW: Any VST3-compatible host
+- DAW: Any VST3-compatible host (see compatibility list below)
+
+**Supported DAWs:**
+- ✅ Ableton Live 10+
+- ✅ FL Studio 20+
+- ✅ Reaper 5.0+
+- ✅ Bitwig Studio 3.0+
+- ✅ Steinberg Cubase 10.5+
+- ✅ PreSonus Studio One 4+
+- ✅ Tracktion Waveform
+- ✅ Steinberg Nuendo
+
+**NOT Compatible:**
+- ❌ Audacity (does not support VST3)
+- ❌ Pro Tools (requires AAX format)
+- ❌ Older DAWs without VST3 support
 
 **Recommended:**
 - CPU: Quad-core 2.5 GHz or better

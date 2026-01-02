@@ -68,7 +68,8 @@ MAEVN v1.0.0 represents the first full production-ready release of the AI-powere
 ### Integration
 - ✅ **VST3 Format**
   - Standard VST3 plugin format
-  - Compatible with major DAWs
+  - Compatible with major DAWs (Ableton, FL Studio, Reaper, Bitwig, Cubase, etc.)
+  - **Note:** Not compatible with Audacity (no VST3 support)
   - Proper plugin metadata
 
 - ✅ **DAW Synchronization**
@@ -78,6 +79,7 @@ MAEVN v1.0.0 represents the first full production-ready release of the AI-powere
 
 - ✅ **Standalone Application**
   - Test without DAW
+  - Alternative for non-VST3 DAWs (like Audacity)
   - Direct MIDI input
   - Audio device selection
 
