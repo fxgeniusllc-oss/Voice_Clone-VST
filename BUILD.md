@@ -23,7 +23,8 @@ This guide provides detailed instructions for building the MAEVN VST3 plugin on 
 - FL Studio 20+
 - Reaper 5.0+
 - Bitwig Studio 3.0+
-- Steinberg Cubase/Nuendo 10.5+
+- Steinberg Cubase 10.5+
+- Steinberg Nuendo
 - PreSonus Studio One 4+
 - Tracktion Waveform
 

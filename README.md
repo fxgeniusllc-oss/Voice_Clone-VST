@@ -116,7 +116,6 @@ Voice_Clone-VST/
 - Reaper 5.0+
 - Bitwig Studio 3.0+
 - PreSonus Studio One 4+
-- Cockos Reaper
 - Tracktion Waveform
 - Steinberg Nuendo
 
