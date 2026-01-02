@@ -1,8 +1,8 @@
 # 🎚 MAEVN — AI-Powered Vocal + Instrument Generator (VST3) 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)]()
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)
 
 MAEVN is a **JUCE-based VST3 plugin** with **ONNX Runtime integration**, bridging AI technologies with professional music production. It's an experimental AI DAW tool that enables real-time operation inside Digital Audio Workstations (DAWs), providing live timeline arrangement, automatic effects automation, and seamless DAW synchronization.
 
