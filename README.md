@@ -459,7 +459,7 @@ See [CMI/operational_ethics.md](CMI/operational_ethics.md) for complete guidelin
 - **[README.md](README.md)** — This file (overview and quick start)
 - **[BUILD.md](BUILD.md)** — Detailed build instructions for all platforms
 - **[ARCHITECTURE.md](ARCHITECTURE.md)** — System architecture and design
-- **[QUICKSTART.md](QUICKSTART.md)** — User quick start guide
+- **QUICKSTART.md** — User quick start guide _(planned; to be added)_
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** — Contribution guidelines
 - **[TESTING.md](TESTING.md)** — Testing guidelines and practices
 - **[CMI/README.md](CMI/README.md)** — Multi-agent development system
