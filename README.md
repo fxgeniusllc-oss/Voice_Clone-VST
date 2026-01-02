@@ -15,57 +15,97 @@ Overall, MAEVN is framed as an end-to-end AI DAW tool that enables real-time ope
 🔑 **Core Components**
 
 - **JUCE Plugin Layer:** 
-    - **PluginProcessor:** Handles the audio processing block, routing audio I/O to the PatternEngine, OnnxEngine, and AIFXEngine.
-    - **PluginEditor:** Provides the user interface, including timeline lanes, preset browser, and undo history.
+    - **PluginProcessor:** Handles the audio processing block, routing audio I/O to AudioEngine components.
+    - **PluginEditor:** Provides the user interface with MainComponent and TimelineComponent.
 
 - **ONNX Engine:**
-    - **OnnxEngine:** Encapsulates the ONNX Runtime C++ API, supporting live model updates through hot reloading from the /Models/ directory and enabling multiple instrument/vocal models to function simultaneously.
+    - **ONNXInference:** Encapsulates the ONNX Runtime C++ API, supporting live model updates through hot reloading from the /Models/ directory and enabling multiple instrument/vocal models to function simultaneously.
 
 - **Pattern Engine:** 
     - Parses input from the lyrical stage script to determine the arrangement of musical blocks, manages synchronization with the DAW’s playhead, and triggers instruments and vocals.
 
-- **AI FX Engine:** 
-    - **DSP FX:** Includes effects such as compression, equalization, reverb, and limiting.
-    - **AI FX:** Utilizes ONNX models for effects like autotuning and AI mastering, with the option for mixing DSP and AI in a sequential effects chain.
+- **FX Chain:** 
+    - **FXChain:** Manages the serial processing of multiple effects.
+    - **DSP FX:** Includes effects such as distortion, delay, and reverb.
+    - **AI FX (AIEffects):** Utilizes ONNX models for AI-powered effects, with the option for mixing DSP and AI in a sequential effects chain.
 
-**Timeline Lanes:** Each track lane (VOCAL, 808, HiHat, etc.) offers:
-- **FX Mode Selector:** Options to select Off, DSP, AI, or Hybrid modes.
-- **Preset Load/Save:** Simplifies the management of effect settings.
-- **Block Visualization:** Displays the arrangement graphically.
+- **State Management:**
+    - **MAEVNUndoManager:** Provides undo/redo functionality for user actions.
+    - **ParameterState:** Manages parameter automation and timeline-based changes.
 
-**Preset System:**
-- **FXPreset Struct:** Maintains information such as category, tags, and parameters related to presets, with JSON serialization for seamless data handling.
-- **Preset Browser Component:** Features a categorized filter, search functionality, and a tag cloud for easy navigation of presets.
+**Timeline UI:** 
+- **TimelineComponent:** Displays the arrangement graphically with block visualization.
+- **MainComponent:** Provides controls for instruments, vocals, FX, and master section.
+
+**Note on Planned Features:**
+The following features are mentioned in documentation but not yet fully implemented:
+- FXPreset system with preset browser and categorized filter
+- Preset load/save functionality  
+- UndoHistoryComponent for visual undo stack
+- Per-lane FX mode selectors (Off/DSP/AI/Hybrid)
+- Tag cloud interface for preset navigation
 
 📂 **Repo Structure**  
-MAEVN/
-- ├── CMakeLists.txt          # Build configuration for JUCE + ONNX Runtime
-- ├── README.md               # Documentation
-- ├── Source/                 # Core source files
-- │   ├── PluginProcessor.*   # Core DSP processing logic
-- │   ├── PluginEditor.*      # User interface elements
-- │   ├── OnnxEngine.*        # AI inference handling module
-- │   ├── PatternEngine.*     # Script parsing and arrangement logic
-- │   ├── AIFXEngine.*        # Hybrid effects processing
-- │   ├── TimelineLane.*      # GUI elements for track lanes
-- │   ├── FXPreset.*          # Preset management schema
-- │   ├── FXPresetManager.*   # Handling of preset I/O operations
-- │   ├── PresetBrowserComponent.* # User interface for preset navigation
-- │   ├── GlobalUndoManager.* # Management of action history
-- │   ├── UndoHistoryComponent.* # User interface for undo list
-- │   └── Utilities.h         # Shared utility functions and constants
-- ├── Models/                 # Directory for ONNX models
-- │   ├── drums/              # Drum instrument models
-- │   │   ├── 808_ddsp.onnx
-- │   │   ├── hihat_ddsp.onnx
-- │   │   └── snare_ddsp.onnx
-- │   ├── instruments/        # Instrument models
-- │   │   ├── piano_ddsp.onnx
-- │   │   └── synth_fm.onnx
-- │   └── vocals/             # Vocal models
-- │       ├── vocals_tts.onnx
-- │       └── vocals_hifigan.onnx
-- └── config.json             # Maps model roles to file paths
+```
+Voice_Clone-VST/
+├── CMakeLists.txt                    # Build configuration for JUCE + ONNX Runtime
+├── README.md                         # This file
+├── BUILD.md                          # Detailed build instructions
+├── ARCHITECTURE.md                   # System architecture documentation
+├── CONTRIBUTING.md                   # Contribution guidelines
+├── setup_maevn_repo.bat/.sh         # Repository setup scripts
+├── build_maevn_onnx.bat/.sh         # ONNX model export scripts
+├── Source/                           # Core source files
+│   ├── PluginProcessor.*             # Core DSP processing logic
+│   ├── PluginEditor.*                # User interface elements
+│   ├── Audio/                        # Audio processing modules
+│   │   ├── AudioEngine.*             # Main audio engine
+│   │   └── InstrumentGenerator.*     # Instrument synthesis
+│   ├── AI/                           # AI/ML components
+│   │   ├── ONNXInference.*           # ONNX Runtime wrapper
+│   │   ├── VocalSynthesis.*          # TTS and vocoder integration
+│   │   └── AIEffects.*               # AI-powered audio effects
+│   ├── DSP/                          # DSP effects
+│   │   ├── FXChain.*                 # Effect chain manager
+│   │   └── Effects.*                 # DSP effect implementations
+│   ├── Parser/                       # Script parsing
+│   │   ├── ScriptParser.*            # Stage script parser
+│   │   └── Arrangement.*             # Timeline arrangement
+│   ├── State/                        # State management
+│   │   ├── UndoManager.*             # Undo/redo system
+│   │   └── ParameterState.*          # Parameter automation
+│   └── UI/                           # User interface
+│       ├── MainComponent.*           # Main UI component
+│       └── TimelineComponent.*       # Timeline visualization
+├── Models/                           # ONNX model storage
+│   ├── config.json                   # Model configuration
+│   ├── metadata.json                 # Model metadata
+│   ├── LayerMap.md                   # Model documentation
+│   ├── drums/                        # Drum synthesis models
+│   │   └── README.md                 # Drum model documentation
+│   ├── instruments/                  # Instrument models
+│   │   └── README.md                 # Instrument model documentation
+│   └── vocals/                       # Vocal models
+│       └── README.md                 # Vocal model documentation
+├── scripts/                          # Python ONNX export scripts
+│   ├── README.md                     # Scripts documentation
+│   ├── export_drum_models.py         # Drum model export
+│   ├── export_instrument_models.py   # Instrument model export
+│   └── export_vocal_models.py        # Vocal model export
+├── Tests/                            # Unit tests
+│   ├── CMakeLists.txt
+│   ├── ScriptParserTests.cpp
+│   ├── ArrangementTests.cpp
+│   ├── AudioEngineTests.cpp
+│   └── BuildVerificationTests.cpp
+├── CMI/                              # Cognitive Mesh Interface (Multi-Agent Dev)
+│   ├── README.md                     # CMI overview
+│   ├── MACF.md                       # Multi-Agent Command Framework
+│   ├── agent_roles.md                # Agent role definitions
+│   └── operational_ethics.md         # Development ethics guidelines
+└── examples/                         # Example usage
+    └── ARRANGEMENTS.md               # Example stage scripts
+```
 
 ### ⚙️ Build Instructions
 
