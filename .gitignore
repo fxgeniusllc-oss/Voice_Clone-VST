@@ -1,5 +1,6 @@
 # ONNX Model Files - Never commit compiled models
 *.onnx
+*.onnx.data
 
 # Python
 __pycache__/
