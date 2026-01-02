@@ -35,7 +35,7 @@ MAEVN is a **JUCE-based VST3 plugin** with **ONNX Runtime integration**, bridgin
 
 ### For Users (Pre-built Binary)
 
-1. Download the latest release from [Releases](../../releases)
+1. Download the latest release from [Releases](../../releases) (when available)
 2. Copy `MAEVN.vst3` to your plugin folder:
    - **Windows:** `C:\Program Files\Common Files\VST3\`
    - **macOS:** `~/Library/Audio/Plug-Ins/VST3/`
