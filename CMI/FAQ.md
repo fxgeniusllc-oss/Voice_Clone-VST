@@ -24,6 +24,7 @@
 - ✅ Reaper 5.0+
 - ✅ Bitwig Studio 3.0+
 - ✅ Steinberg Cubase 10.5+
+- ✅ Steinberg Nuendo
 - ✅ PreSonus Studio One 4+
 - ✅ Tracktion Waveform
 
