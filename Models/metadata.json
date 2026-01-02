@@ -1,7 +1,7 @@
 {
   "version": "2.0",
   "description": "MAEVN Production-Grade ONNX Model Metadata Registry",
-  "last_updated": "2026-01-02T13:52:38Z",
+  "last_updated": "2026-01-02T00:00:00Z",
   "models": [
     {
       "id": "vocals_tts",

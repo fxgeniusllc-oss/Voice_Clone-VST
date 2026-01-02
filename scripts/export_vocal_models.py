@@ -28,7 +28,7 @@ class MultiHeadAttention(nn.Module):
         super().__init__()
         self.num_heads = num_heads
         self.head_dim = embed_dim // num_heads
-        self.scale = math.sqrt(self.head_dim)
+        self.scale = 1.0 / math.sqrt(self.head_dim)  # Proper attention scaling
         
         self.qkv = nn.Linear(embed_dim, embed_dim * 3)
         self.out_proj = nn.Linear(embed_dim, embed_dim)
@@ -159,6 +159,7 @@ class ProductionVocoderModel(nn.Module):
         self.mel_length = mel_length
         self.audio_length = audio_length
         self.upsample_factor = audio_length // mel_length
+        self.num_mrf_branches = 3  # Number of receptive field branches per MRF block
         
         # Initial convolution
         self.conv_pre = nn.Conv1d(mel_channels, 512, kernel_size=7, padding=3)
@@ -225,7 +226,7 @@ class ProductionVocoderModel(nn.Module):
             mrf_sum = 0
             for conv_block in mrf_block:
                 mrf_sum = mrf_sum + conv_block(x)
-            x = x + mrf_sum / len(mrf_block)  # Residual + MRF average
+            x = x + mrf_sum / self.num_mrf_branches  # Residual + MRF average
         
         # Final convolution
         audio = self.conv_post(x)
@@ -351,7 +352,7 @@ def main():
     print("\nProduction Quality Features:")
     print("  ✓ State-of-the-art TTS architecture (Tacotron 2-inspired)")
     print("  ✓ Advanced vocoder with MRF (HiFi-GAN-inspired)")
-    print("  ✓ ~50-80M parameters (TTS + Vocoder combined)")
+    print("  ✓ ~27.7M parameters combined (TTS: 22M + Vocoder: 5.6M)")
     print("  ✓ High-fidelity 44.1kHz audio generation")
     print("  ✓ Multi-head attention for natural prosody")
     print("  ✓ Multi-receptive field fusion for audio quality")
