@@ -137,24 +137,65 @@ cmake --build . --config Release
 cmake --build . --config Release -j$(nproc)
 ```
 
-5. **Install (optional):**
+5. **Install:**
 
-The build automatically installs to your system VST3 directory. To install manually:
+After building, use the installation script to install both VST3 and standalone:
+
+**Windows:**
+```cmd
+cd ..
+install_maevn.bat
+```
+
+**macOS/Linux:**
+```bash
+cd ..
+./install_maevn.sh
+```
+
+This will:
+- Install the VST3 plugin to your system's plugin directory
+- Install the standalone application
+- Create desktop shortcuts (Linux) or Start Menu shortcuts (Windows)
+- Set up launcher scripts
+
+**Manual Installation (optional):**
+
+If you prefer manual installation:
 
 **Windows:**
 ```cmd
 copy MAEVN_artefacts\Release\VST3\MAEVN.vst3 "C:\Program Files\Common Files\VST3\"
+copy MAEVN_artefacts\Release\Standalone\MAEVN.exe "C:\Program Files\MAEVN\"
 ```
 
 **macOS:**
 ```bash
 cp -r MAEVN_artefacts/Release/VST3/MAEVN.vst3 ~/Library/Audio/Plug-Ins/VST3/
+cp -r MAEVN_artefacts/Release/Standalone/MAEVN.app /Applications/
 ```
 
 **Linux:**
 ```bash
 cp -r MAEVN_artefacts/Release/VST3/MAEVN.vst3 ~/.vst3/
+cp MAEVN_artefacts/Release/Standalone/MAEVN ~/.local/bin/
 ```
+
+6. **Launch Standalone:**
+
+After installation, launch MAEVN standalone:
+
+**Windows:**
+```cmd
+launch_maevn.bat
+```
+
+**macOS/Linux:**
+```bash
+./launch_maevn.sh
+```
+
+Or find it in your system's application menu.
 
 ### Build Verification
 

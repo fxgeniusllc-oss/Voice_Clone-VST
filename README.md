@@ -56,12 +56,17 @@ cd Voice_Clone-VST
 # 3. Export default ONNX models (optional, requires Python 3.10+)
 ./build_maevn_onnx.sh  # or build_maevn_onnx.bat on Windows
 
-# 4. Build plugin
+# 4. Build plugin and standalone
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 cmake --build . --config Release
 
-# 5. Install (plugin will be in build/MAEVN_artefacts/Release/VST3/)
+# 5. Install standalone app and VST3 plugin
+cd ..
+./install_maevn.sh  # or install_maevn.bat on Windows
+
+# 6. Launch standalone (or use from DAW as VST3)
+./launch_maevn.sh  # or launch_maevn.bat on Windows
 ```
 
 See [BUILD.md](BUILD.md) for detailed build instructions.

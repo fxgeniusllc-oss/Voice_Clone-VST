@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=MAEVN
+GenericName=AI-Powered Audio Synthesizer
+Comment=AI-Powered Vocal and Instrument Generator (Standalone)
+Exec=/usr/local/bin/MAEVN
+Icon=maevn
+Terminal=false
+Categories=AudioVideo;Audio;Midi;Sequencer;
+Keywords=audio;midi;synthesizer;music;vst;plugin;ai;vocal;
+StartupNotify=true
+StartupWMClass=MAEVN
