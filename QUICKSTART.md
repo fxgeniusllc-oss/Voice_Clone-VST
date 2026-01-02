@@ -32,7 +32,7 @@ cmake --build . --config Release
 
 ### Loading the Plugin
 
-1. Open your DAW (see [Compatible DAWs](#compatible-daws-vst3-required) below)
+1. Open your DAW (see compatible DAWs listed below)
 2. Create a new MIDI/Instrument track
 3. Load MAEVN as a VST3 instrument
 4. Send MIDI notes to hear the instruments
