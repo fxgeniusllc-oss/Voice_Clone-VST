@@ -4,6 +4,40 @@
 
 ---
 
+## 🎛️ DAW Compatibility
+
+### Q: Can I use MAEVN with Audacity?
+
+**A:** No, unfortunately MAEVN is not currently compatible with Audacity. Here's why:
+
+- **MAEVN** is built as a **VST3** plugin
+- **Audacity** only supports **VST2** (legacy), **LV2**, and **AU** (macOS) plugin formats
+- Audacity **does not support VST3** plugins
+
+**Workaround Options:**
+1. **Use the Standalone version** - MAEVN can be built as a standalone application that runs independently without a DAW
+2. **Use a VST3-compatible DAW** - See the list of compatible DAWs below
+
+**Compatible DAWs (VST3 Support):**
+- ✅ Ableton Live 10+
+- ✅ FL Studio 20+
+- ✅ Reaper 5.0+
+- ✅ Bitwig Studio 3.0+
+- ✅ Steinberg Cubase 10.5+
+- ✅ PreSonus Studio One 4+
+- ✅ Tracktion Waveform
+
+**Why not add VST2/LV2 support?**
+- VST2 SDK was deprecated by Steinberg and removed from JUCE framework
+- Adding LV2 support would require significant development effort
+- VST3 is the modern standard supported by most DAWs
+
+**Future Plans:**
+- LV2 format support may be considered in future releases
+- Community contributions for additional plugin formats are welcome
+
+---
+
 ## 🤖 General Questions
 
 ### Q: What is the Multi-Agent Development System?

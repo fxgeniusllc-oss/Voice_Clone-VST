@@ -2,14 +2,38 @@
 
 This guide provides detailed instructions for building the MAEVN VST3 plugin on different platforms.
 
+**⚠️ Important Note:** MAEVN builds as a VST3 plugin, which is not compatible with Audacity. If you need to use MAEVN with Audacity, consider using the Standalone build or a VST3-compatible DAW. See [DAW Compatibility](#daw-compatibility) below.
+
 ## Table of Contents
 
-1. [Prerequisites](#prerequisites)
-2. [Windows Build](#windows-build)
-3. [macOS Build](#macos-build)
-4. [Linux Build](#linux-build)
-5. [ONNX Runtime Integration](#onnx-runtime-integration)
-6. [Troubleshooting](#troubleshooting)
+1. [DAW Compatibility](#daw-compatibility)
+2. [Prerequisites](#prerequisites)
+3. [Windows Build](#windows-build)
+4. [macOS Build](#macos-build)
+5. [Linux Build](#linux-build)
+6. [ONNX Runtime Integration](#onnx-runtime-integration)
+7. [Troubleshooting](#troubleshooting)
+
+## DAW Compatibility
+
+**Plugin Format:** VST3 and Standalone
+
+**✅ Compatible DAWs:**
+- Ableton Live 10+
+- FL Studio 20+
+- Reaper 5.0+
+- Bitwig Studio 3.0+
+- Steinberg Cubase/Nuendo 10.5+
+- PreSonus Studio One 4+
+- Tracktion Waveform
+
+**❌ NOT Compatible:**
+- **Audacity** (does not support VST3 format - only VST2/LV2/AU)
+- Pro Tools (requires AAX format)
+- Older DAWs without VST3 support
+
+**Workaround for Audacity Users:**
+Use the Standalone build which can run independently without a DAW.
 
 ## Prerequisites
 

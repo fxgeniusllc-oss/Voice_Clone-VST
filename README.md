@@ -107,6 +107,28 @@ Voice_Clone-VST/
     └── ARRANGEMENTS.md               # Example stage scripts
 ```
 
+### 🎛️ DAW Compatibility
+
+**✅ Compatible DAWs (VST3 Support Required):**
+- Ableton Live 10+
+- Steinberg Cubase 10.5+
+- FL Studio 20+
+- Reaper 5.0+
+- Bitwig Studio 3.0+
+- PreSonus Studio One 4+
+- Cockos Reaper
+- Tracktion Waveform
+- Steinberg Nuendo
+
+**❌ Currently NOT Compatible:**
+- **Audacity** - Does not support VST3 format (only VST2/LV2/AU)
+- Pro Tools (AAX format required)
+- Older DAWs without VST3 support
+
+**Note:** MAEVN is built as a VST3 plugin. To use MAEVN, your DAW must support the VST3 plugin format. Audacity currently does not support VST3 plugins, only legacy VST2, LV2, and AU formats.
+
+**Standalone Mode:** MAEVN also builds as a standalone application that can be run independently without a DAW.
+
 ### ⚙️ Build Instructions
 
 **Requirements:**

@@ -32,10 +32,19 @@ cmake --build . --config Release
 
 ### Loading the Plugin
 
-1. Open your DAW (Ableton, FL Studio, Logic Pro, Reaper, etc.)
+1. Open your DAW (see compatibility list below)
 2. Create a new MIDI/Instrument track
 3. Load MAEVN as a VST3 instrument
 4. Send MIDI notes to hear the instruments
+
+**Compatible DAWs (VST3 Required):**
+- Ableton Live 10+, FL Studio 20+, Reaper 5.0+, Bitwig Studio 3.0+
+- Steinberg Cubase/Nuendo 10.5+, PreSonus Studio One 4+, Tracktion Waveform
+
+**Not Compatible:**
+- ❌ Audacity (does not support VST3 format)
+
+**Alternative:** Use MAEVN in Standalone mode (no DAW required)
 
 ### Basic Configuration
 
