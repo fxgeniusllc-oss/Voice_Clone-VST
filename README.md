@@ -1,7 +1,7 @@
 # 🎚 MAEVN — AI-Powered Vocal + Instrument Generator (VST3) 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)
+[![CI Build and Test](https://github.com/fxgeniusllc-oss/Voice_Clone-VST/actions/workflows/ci.yml/badge.svg)](https://github.com/fxgeniusllc-oss/Voice_Clone-VST/actions/workflows/ci.yml)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)
 
 MAEVN is a **JUCE-based VST3 plugin** with **ONNX Runtime integration**, bridging AI technologies with professional music production. It's an experimental AI DAW tool that enables real-time operation inside Digital Audio Workstations (DAWs), providing live timeline arrangement, automatic effects automation, and seamless DAW synchronization.
@@ -24,6 +24,7 @@ MAEVN is a **JUCE-based VST3 plugin** with **ONNX Runtime integration**, bridgin
 - [Repository Structure](#-repository-structure)
 - [DAW Compatibility](#%EF%B8%8F-daw-compatibility)
 - [Build Instructions](#%EF%B8%8F-build-instructions)
+- [CI/CD Pipeline](#%EF%B8%8F-cicd-pipeline)
 - [Usage Guide](#-usage-guide)
 - [Contributing](#-contributing)
 - [Multi-Agent Development](#-multi-agent-development-system)
@@ -317,6 +318,82 @@ cmake .. \
 
 **Note:** Without ONNX Runtime, MAEVN uses high-quality DSP fallbacks for all AI features.
 
+## ⚙️ CI/CD Pipeline
+
+MAEVN includes a comprehensive CI/CD pipeline with **dynamic firewall configuration** for GitHub Actions workflows.
+
+### Automated Builds
+
+The CI pipeline automatically builds and tests MAEVN on every push:
+
+- **Linux** — Ubuntu latest with all dependencies
+- **macOS** — macOS latest with Homebrew
+- **Windows** — Windows latest with Visual Studio 2022
+
+### Dynamic Firewall Configuration
+
+The pipeline includes **pre-rules-based firewall configuration** that:
+
+1. **Detects** the GitHub Actions runner's IP address
+2. **Configures** firewall rules to whitelist the runner
+3. **Runs** build and test jobs with access to protected resources
+4. **Cleans up** firewall rules after jobs complete
+
+This enables access to:
+- Private package repositories
+- Internal databases for integration tests
+- Protected APIs and services
+
+### Workflows
+
+**Main CI Workflow (`.github/workflows/ci.yml`):**
+- Runs on push to `main`, `dev`, or `copilot/**` branches
+- Configures firewall pre-rules
+- Builds on Linux, macOS, and Windows in parallel
+- Runs all tests
+- Uploads build artifacts
+- Automatically cleans up firewall rules
+
+**Advanced Firewall Workflow (`.github/workflows/firewall-config.yml`):**
+- Manual trigger with provider selection
+- Supports AWS Security Groups, Azure NSG, GCP Firewall, or custom APIs
+- Configurable cleanup behavior
+
+### Firewall Providers Supported
+
+- **AWS Security Groups** — EC2 security group ingress rules
+- **Azure NSG** — Network Security Group rules
+- **GCP Firewall** — VPC firewall rules
+- **Custom API** — Any REST API-based firewall
+
+### Configuration
+
+Set up GitHub Secrets for your firewall provider:
+
+```
+AWS_REGION, AWS_SECURITY_GROUP_ID          # For AWS
+AZURE_RESOURCE_GROUP, AZURE_NSG_NAME       # For Azure
+GCP_PROJECT, GCP_NETWORK                   # For GCP
+FIREWALL_API_URL, FIREWALL_API_TOKEN       # For Custom
+```
+
+See [.github/FIREWALL_CONFIG.md](.github/FIREWALL_CONFIG.md) for complete documentation.
+
+### Reusable Action
+
+Use the `configure-firewall` action in your own workflows:
+
+```yaml
+- name: Configure Firewall
+  uses: ./.github/actions/configure-firewall
+  with:
+    provider: 'aws'
+    action: 'allow'
+    port: '443'
+    aws-region: ${{ secrets.AWS_REGION }}
+    aws-security-group-id: ${{ secrets.AWS_SECURITY_GROUP_ID }}
+```
+
 ## 📖 Usage Guide
 
 ### Interface Overview
@@ -472,6 +549,7 @@ See [CMI/operational_ethics.md](CMI/operational_ethics.md) for complete guidelin
 - **[LAUNCHER_GUIDE.md](LAUNCHER_GUIDE.md)** — Launcher and installation guide
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** — Contribution guidelines
 - **[TESTING.md](TESTING.md)** — Testing guidelines and practices
+- **[.github/FIREWALL_CONFIG.md](.github/FIREWALL_CONFIG.md)** — CI/CD firewall configuration
 - **[CMI/README.md](CMI/README.md)** — Multi-agent development system
 - **[examples/ARRANGEMENTS.md](examples/ARRANGEMENTS.md)** — Example stage scripts
 
