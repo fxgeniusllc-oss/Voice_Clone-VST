@@ -53,5 +53,9 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState> parameters;
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
+    // Standalone readiness tracking
+    int prepareCallCount = 0;
+    bool isStandaloneInitialized = false;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MAEVNAudioProcessor)
 };

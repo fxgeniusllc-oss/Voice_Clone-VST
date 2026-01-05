@@ -118,7 +118,37 @@ void MAEVNAudioProcessor::changeProgramName(int index, const juce::String& newNa
 
 void MAEVNAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
+    // Check if we're running in standalone mode
+    #if JucePlugin_Build_Standalone
+    // Perform 3x recursion for plugin readiness in standalone mode
+    if (!isStandaloneInitialized)
+    {
+        // First prepare call
+        audioEngine.prepare(sampleRate, samplesPerBlock);
+        prepareCallCount++;
+        
+        // Second prepare call (recursion 1)
+        audioEngine.prepare(sampleRate, samplesPerBlock);
+        prepareCallCount++;
+        
+        // Third prepare call (recursion 2)
+        audioEngine.prepare(sampleRate, samplesPerBlock);
+        prepareCallCount++;
+        
+        isStandaloneInitialized = true;
+        
+        juce::Logger::writeToLog("MAEVN Standalone: Plugin readiness initialized with 3x recursion (prepare called " 
+                                 + juce::String(prepareCallCount) + " times)");
+    }
+    else
+    {
+        // Normal prepare call after initialization
+        audioEngine.prepare(sampleRate, samplesPerBlock);
+    }
+    #else
+    // VST3 mode - normal single prepare call
     audioEngine.prepare(sampleRate, samplesPerBlock);
+    #endif
 }
 
 void MAEVNAudioProcessor::releaseResources()
