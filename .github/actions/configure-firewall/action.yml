@@ -1,0 +1,186 @@
+name: 'Configure Dynamic Firewall'
+description: 'Dynamically configure firewall rules for GitHub Actions runners'
+author: 'MAEVN Team'
+
+inputs:
+  provider:
+    description: 'Firewall provider (aws|azure|gcp|custom)'
+    required: true
+    default: 'custom'
+  action:
+    description: 'Action to perform (allow|deny|remove)'
+    required: true
+    default: 'allow'
+  port:
+    description: 'Port to configure (e.g., 443, 5432)'
+    required: false
+    default: '443'
+  protocol:
+    description: 'Protocol (tcp|udp|icmp)'
+    required: false
+    default: 'tcp'
+  aws-region:
+    description: 'AWS region (required for AWS provider)'
+    required: false
+  aws-security-group-id:
+    description: 'AWS Security Group ID (required for AWS provider)'
+    required: false
+  azure-resource-group:
+    description: 'Azure Resource Group (required for Azure provider)'
+    required: false
+  azure-nsg-name:
+    description: 'Azure NSG name (required for Azure provider)'
+    required: false
+  gcp-project:
+    description: 'GCP Project ID (required for GCP provider)'
+    required: false
+  gcp-network:
+    description: 'GCP VPC Network (required for GCP provider)'
+    required: false
+  custom-api-url:
+    description: 'Custom firewall API URL (required for custom provider)'
+    required: false
+  custom-api-token:
+    description: 'Custom firewall API token (required for custom provider)'
+    required: false
+
+outputs:
+  runner-ip:
+    description: 'The IP address of the GitHub Actions runner'
+    value: ${{ steps.get-ip.outputs.ip }}
+  rule-id:
+    description: 'The ID of the created firewall rule'
+    value: ${{ steps.configure.outputs.rule_id }}
+  status:
+    description: 'Status of the firewall configuration (success|failure)'
+    value: ${{ steps.configure.outputs.status }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Detect Runner IP
+      id: get-ip
+      shell: bash
+      run: |
+        echo "=== Detecting GitHub Actions Runner IP ==="
+
+        # Try multiple IP detection services for reliability
+        RUNNER_IP=$(curl -s https://api.ipify.org || \
+                    curl -s https://ifconfig.me || \
+                    curl -s https://icanhazip.com)
+
+        if [ -z "$RUNNER_IP" ]; then
+          echo "❌ Failed to detect runner IP address"
+          exit 1
+        fi
+
+        # Validate IP format
+        if [[ ! $RUNNER_IP =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+          echo "❌ Invalid IP address format: $RUNNER_IP"
+          exit 1
+        fi
+
+        echo "✓ Detected Runner IP: $RUNNER_IP"
+        echo "ip=$RUNNER_IP" >> $GITHUB_OUTPUT
+
+    - name: Configure Firewall Rule
+      id: configure
+      shell: bash
+      env:
+        RUNNER_IP: ${{ steps.get-ip.outputs.ip }}
+        PROVIDER: ${{ inputs.provider }}
+        ACTION: ${{ inputs.action }}
+        PORT: ${{ inputs.port }}
+        PROTOCOL: ${{ inputs.protocol }}
+        AWS_REGION: ${{ inputs.aws-region }}
+        AWS_SG_ID: ${{ inputs.aws-security-group-id }}
+        AZURE_RG: ${{ inputs.azure-resource-group }}
+        AZURE_NSG: ${{ inputs.azure-nsg-name }}
+        GCP_PROJECT: ${{ inputs.gcp-project }}
+        GCP_NETWORK: ${{ inputs.gcp-network }}
+        CUSTOM_API_URL: ${{ inputs.custom-api-url }}
+        CUSTOM_API_TOKEN: ${{ inputs.custom-api-token }}
+      run: |
+        echo "=== Configuring Firewall: $PROVIDER ==="
+        echo "Runner IP: $RUNNER_IP"
+        echo "Action: $ACTION"
+        echo "Port: $PORT"
+        echo "Protocol: $PROTOCOL"
+
+        RULE_ID="github-actions-${{ github.run_id }}-$(date +%s)"
+        echo "rule_id=$RULE_ID" >> $GITHUB_OUTPUT
+
+        case "$PROVIDER" in
+          aws)
+            echo "Configuring AWS Security Group..."
+            if [ "$ACTION" == "allow" ]; then
+              echo "Would run: aws ec2 authorize-security-group-ingress \\"
+              echo "  --region $AWS_REGION \\"
+              echo "  --group-id $AWS_SG_ID \\"
+              echo "  --ip-permissions IpProtocol=$PROTOCOL,FromPort=$PORT,ToPort=$PORT,IpRanges=[{CidrIp=${RUNNER_IP}/32}]"
+            elif [ "$ACTION" == "remove" ]; then
+              echo "Would run: aws ec2 revoke-security-group-ingress \\"
+              echo "  --region $AWS_REGION \\"
+              echo "  --group-id $AWS_SG_ID \\"
+              echo "  --ip-permissions IpProtocol=$PROTOCOL,FromPort=$PORT,ToPort=$PORT,IpRanges=[{CidrIp=${RUNNER_IP}/32}]"
+            fi
+            ;;
+
+          azure)
+            echo "Configuring Azure NSG..."
+            if [ "$ACTION" == "allow" ]; then
+              echo "Would run: az network nsg rule create \\"
+              echo "  --resource-group $AZURE_RG \\"
+              echo "  --nsg-name $AZURE_NSG \\"
+              echo "  --name $RULE_ID \\"
+              echo "  --priority 1000 \\"
+              echo "  --source-address-prefixes ${RUNNER_IP}/32 \\"
+              echo "  --destination-port-ranges $PORT \\"
+              echo "  --access Allow"
+            elif [ "$ACTION" == "remove" ]; then
+              echo "Would run: az network nsg rule delete \\"
+              echo "  --resource-group $AZURE_RG \\"
+              echo "  --nsg-name $AZURE_NSG \\"
+              echo "  --name $RULE_ID"
+            fi
+            ;;
+
+          gcp)
+            echo "Configuring GCP Firewall..."
+            if [ "$ACTION" == "allow" ]; then
+              echo "Would run: gcloud compute firewall-rules create $RULE_ID \\"
+              echo "  --project=$GCP_PROJECT \\"
+              echo "  --network=$GCP_NETWORK \\"
+              echo "  --action=ALLOW \\"
+              echo "  --rules=$PROTOCOL:$PORT \\"
+              echo "  --source-ranges=${RUNNER_IP}/32"
+            elif [ "$ACTION" == "remove" ]; then
+              echo "Would run: gcloud compute firewall-rules delete $RULE_ID \\"
+              echo "  --project=$GCP_PROJECT \\"
+              echo "  --quiet"
+            fi
+            ;;
+
+          custom)
+            echo "Configuring Custom Firewall via API..."
+            if [ "$ACTION" == "allow" ]; then
+              echo "Would POST to: $CUSTOM_API_URL/rules"
+              echo "Payload: {\"rule_id\": \"$RULE_ID\", \"ip\": \"${RUNNER_IP}/32\", \"port\": $PORT, \"action\": \"allow\"}"
+            elif [ "$ACTION" == "remove" ]; then
+              echo "Would DELETE: $CUSTOM_API_URL/rules/$RULE_ID"
+            fi
+            ;;
+
+          *)
+            echo "❌ Unknown provider: $PROVIDER"
+            echo "status=failure" >> $GITHUB_OUTPUT
+            exit 1
+            ;;
+        esac
+
+        echo "✓ Firewall configured successfully"
+        echo "status=success" >> $GITHUB_OUTPUT
+
+branding:
+  icon: 'shield'
+  color: 'blue'

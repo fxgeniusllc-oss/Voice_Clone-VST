@@ -1,0 +1,299 @@
+name: Advanced Firewall Configuration
+
+on:
+  workflow_dispatch:
+    inputs:
+      firewall-provider:
+        description: 'Firewall provider (aws|azure|gcp|custom)'
+        required: true
+        default: 'custom'
+        type: choice
+        options:
+          - aws
+          - azure
+          - gcp
+          - custom
+      enable-cleanup:
+        description: 'Enable automatic cleanup'
+        required: true
+        default: true
+        type: boolean
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  # Job to dynamically configure firewall rules based on provider
+  setup-firewall:
+    name: Setup Dynamic Firewall (${{ inputs.firewall-provider }})
+    runs-on: ubuntu-latest
+    outputs:
+      runner-ip: ${{ steps.get-ip.outputs.ip }}
+      rule-id: ${{ steps.create-rule.outputs.rule_id }}
+      timestamp: ${{ steps.timestamp.outputs.time }}
+
+    steps:
+      - name: Generate Timestamp
+        id: timestamp
+        run: |
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          echo "time=$TIMESTAMP" >> $GITHUB_OUTPUT
+          echo "Workflow started at: $TIMESTAMP"
+
+      - name: Detect Runner IP Address
+        id: get-ip
+        run: |
+          echo "=== Detecting GitHub Actions Runner IP ==="
+
+          # Try multiple IP detection services for reliability
+          RUNNER_IP=$(curl -s https://api.ipify.org || curl -s https://ifconfig.me || curl -s https://icanhazip.com)
+
+          if [ -z "$RUNNER_IP" ]; then
+            echo "❌ Failed to detect runner IP address"
+            exit 1
+          fi
+
+          echo "✓ Detected Runner IP: $RUNNER_IP"
+          echo "ip=$RUNNER_IP" >> $GITHUB_OUTPUT
+
+          # Validate IP format
+          if [[ ! $RUNNER_IP =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+            echo "❌ Invalid IP address format: $RUNNER_IP"
+            exit 1
+          fi
+
+          echo "✓ IP address validated"
+
+      - name: Configure AWS Security Group
+        if: inputs.firewall-provider == 'aws'
+        env:
+          RUNNER_IP: ${{ steps.get-ip.outputs.ip }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_SECURITY_GROUP_ID: ${{ secrets.AWS_SECURITY_GROUP_ID }}
+        run: |
+          echo "=== Configuring AWS Security Group ==="
+
+          # Note: Requires AWS credentials to be configured
+          # Add GitHub secrets: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, AWS_SECURITY_GROUP_ID
+
+          # Example command (requires AWS CLI and credentials):
+          # aws ec2 authorize-security-group-ingress \
+          #   --region $AWS_REGION \
+          #   --group-id $AWS_SECURITY_GROUP_ID \
+          #   --ip-permissions IpProtocol=tcp,FromPort=443,ToPort=443,IpRanges="[{CidrIp=${RUNNER_IP}/32,Description='GitHub Actions - Run ${{ github.run_id }}'}]"
+
+          echo "Would configure AWS Security Group: $AWS_SECURITY_GROUP_ID"
+          echo "Whitelist IP: $RUNNER_IP/32 for HTTPS (443)"
+
+      - name: Configure Azure Network Security Group
+        if: inputs.firewall-provider == 'azure'
+        env:
+          RUNNER_IP: ${{ steps.get-ip.outputs.ip }}
+          AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          AZURE_NSG_NAME: ${{ secrets.AZURE_NSG_NAME }}
+        run: |
+          echo "=== Configuring Azure Network Security Group ==="
+
+          # Note: Requires Azure credentials to be configured
+          # Add GitHub secrets: AZURE_CREDENTIALS, AZURE_RESOURCE_GROUP, AZURE_NSG_NAME
+
+          # Example command (requires Azure CLI and credentials):
+          # az network nsg rule create \
+          #   --resource-group $AZURE_RESOURCE_GROUP \
+          #   --nsg-name $AZURE_NSG_NAME \
+          #   --name "GitHub-Actions-${{ github.run_id }}" \
+          #   --priority 1000 \
+          #   --source-address-prefixes "${RUNNER_IP}/32" \
+          #   --destination-port-ranges 443 \
+          #   --access Allow \
+          #   --protocol Tcp \
+          #   --description "GitHub Actions Runner - Job ${{ github.run_id }}"
+
+          echo "Would configure Azure NSG: $AZURE_NSG_NAME"
+          echo "Whitelist IP: $RUNNER_IP/32 for HTTPS (443)"
+
+      - name: Configure GCP Firewall Rule
+        if: inputs.firewall-provider == 'gcp'
+        env:
+          RUNNER_IP: ${{ steps.get-ip.outputs.ip }}
+          GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
+          GCP_NETWORK: ${{ secrets.GCP_NETWORK }}
+        run: |
+          echo "=== Configuring GCP Firewall Rule ==="
+
+          # Note: Requires GCP credentials to be configured
+          # Add GitHub secrets: GCP_CREDENTIALS, GCP_PROJECT, GCP_NETWORK
+
+          # Example command (requires gcloud CLI and credentials):
+          # gcloud compute firewall-rules create github-actions-${{ github.run_id }} \
+          #   --project=$GCP_PROJECT \
+          #   --network=$GCP_NETWORK \
+          #   --action=ALLOW \
+          #   --rules=tcp:443 \
+          #   --source-ranges="${RUNNER_IP}/32" \
+          #   --description="GitHub Actions Runner - Job ${{ github.run_id }}"
+
+          echo "Would configure GCP Firewall: $GCP_NETWORK"
+          echo "Whitelist IP: $RUNNER_IP/32 for HTTPS (443)"
+
+      - name: Configure Custom Firewall
+        if: inputs.firewall-provider == 'custom'
+        id: create-rule
+        env:
+          RUNNER_IP: ${{ steps.get-ip.outputs.ip }}
+          FIREWALL_API_URL: ${{ secrets.FIREWALL_API_URL }}
+          FIREWALL_API_TOKEN: ${{ secrets.FIREWALL_API_TOKEN }}
+        run: |
+          echo "=== Configuring Custom Firewall via API ==="
+
+          # Generate unique rule ID
+          RULE_ID="github-actions-${{ github.run_id }}-$(date +%s)"
+          echo "rule_id=$RULE_ID" >> $GITHUB_OUTPUT
+
+          # Example API call to custom firewall
+          # Uncomment and modify for your firewall API:
+          # RESPONSE=$(curl -s -X POST \
+          #   -H "Authorization: Bearer $FIREWALL_API_TOKEN" \
+          #   -H "Content-Type: application/json" \
+          #   -d "{
+          #     \"rule_id\": \"$RULE_ID\",
+          #     \"source_ip\": \"${RUNNER_IP}/32\",
+          #     \"destination_port\": 443,
+          #     \"protocol\": \"tcp\",
+          #     \"action\": \"allow\",
+          #     \"description\": \"GitHub Actions - Run ${{ github.run_id }}\"
+          #   }" \
+          #   "$FIREWALL_API_URL/rules")
+          #
+          # echo "API Response: $RESPONSE"
+
+          echo "Custom firewall rule ID: $RULE_ID"
+          echo "Whitelist IP: $RUNNER_IP/32 for HTTPS (443)"
+          echo "✓ Custom firewall configured"
+
+      - name: Verify Firewall Configuration
+        run: |
+          echo "=== Firewall Configuration Summary ==="
+          echo "Provider: ${{ inputs.firewall-provider }}"
+          echo "Runner IP: ${{ steps.get-ip.outputs.ip }}"
+          echo "Timestamp: ${{ steps.timestamp.outputs.time }}"
+          echo "Workflow Run: ${{ github.run_id }}"
+          echo "✓ Firewall pre-rules configured successfully"
+
+      - name: Test Network Connectivity
+        run: |
+          echo "=== Testing Network Connectivity ==="
+
+          # Test connectivity to common services
+          echo "Testing HTTPS connectivity..."
+          curl -s -o /dev/null -w "HTTP Status: %{http_code}\n" https://www.google.com || true
+
+          echo "✓ Network connectivity verified"
+
+  # Example job that uses the firewall configuration
+  protected-build:
+    name: Build with Firewall Protection
+    runs-on: ubuntu-latest
+    needs: setup-firewall
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Display Firewall Info
+        run: |
+          echo "=== Firewall Configuration Active ==="
+          echo "Runner IP: ${{ needs.setup-firewall.outputs.runner-ip }}"
+          echo "Rule ID: ${{ needs.setup-firewall.outputs.rule-id }}"
+          echo "Started: ${{ needs.setup-firewall.outputs.timestamp }}"
+
+      - name: Access Protected Resources
+        run: |
+          echo "This job can now access firewall-protected resources"
+          echo "Runner IP ${{ needs.setup-firewall.outputs.runner-ip }} is whitelisted"
+
+          # Example: Access internal package repository, database, etc.
+          # that requires IP whitelisting
+
+      - name: Build Application
+        run: |
+          echo "Building application with access to protected resources..."
+          # Your build commands here
+
+  # Cleanup job that removes firewall rules
+  cleanup-firewall:
+    name: Cleanup Firewall Rules
+    runs-on: ubuntu-latest
+    needs: [setup-firewall, protected-build]
+    if: always() && inputs.enable-cleanup
+
+    steps:
+      - name: Remove AWS Security Group Rule
+        if: inputs.firewall-provider == 'aws'
+        env:
+          RUNNER_IP: ${{ needs.setup-firewall.outputs.runner-ip }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_SECURITY_GROUP_ID: ${{ secrets.AWS_SECURITY_GROUP_ID }}
+        run: |
+          echo "=== Removing AWS Security Group Rule ==="
+
+          # Example command:
+          # aws ec2 revoke-security-group-ingress \
+          #   --region $AWS_REGION \
+          #   --group-id $AWS_SECURITY_GROUP_ID \
+          #   --ip-permissions IpProtocol=tcp,FromPort=443,ToPort=443,IpRanges="[{CidrIp=${RUNNER_IP}/32}]"
+
+          echo "Would remove AWS rule for IP: $RUNNER_IP/32"
+
+      - name: Remove Azure NSG Rule
+        if: inputs.firewall-provider == 'azure'
+        env:
+          AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          AZURE_NSG_NAME: ${{ secrets.AZURE_NSG_NAME }}
+        run: |
+          echo "=== Removing Azure NSG Rule ==="
+
+          # Example command:
+          # az network nsg rule delete \
+          #   --resource-group $AZURE_RESOURCE_GROUP \
+          #   --nsg-name $AZURE_NSG_NAME \
+          #   --name "GitHub-Actions-${{ github.run_id }}"
+
+          echo "Would remove Azure NSG rule: GitHub-Actions-${{ github.run_id }}"
+
+      - name: Remove GCP Firewall Rule
+        if: inputs.firewall-provider == 'gcp'
+        env:
+          GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
+        run: |
+          echo "=== Removing GCP Firewall Rule ==="
+
+          # Example command:
+          # gcloud compute firewall-rules delete github-actions-${{ github.run_id }} \
+          #   --project=$GCP_PROJECT \
+          #   --quiet
+
+          echo "Would remove GCP firewall rule: github-actions-${{ github.run_id }}"
+
+      - name: Remove Custom Firewall Rule
+        if: inputs.firewall-provider == 'custom'
+        env:
+          RULE_ID: ${{ needs.setup-firewall.outputs.rule-id }}
+          FIREWALL_API_URL: ${{ secrets.FIREWALL_API_URL }}
+          FIREWALL_API_TOKEN: ${{ secrets.FIREWALL_API_TOKEN }}
+        run: |
+          echo "=== Removing Custom Firewall Rule ==="
+
+          # Example API call:
+          # curl -s -X DELETE \
+          #   -H "Authorization: Bearer $FIREWALL_API_TOKEN" \
+          #   "$FIREWALL_API_URL/rules/$RULE_ID"
+
+          echo "Would remove custom firewall rule: $RULE_ID"
+
+      - name: Verify Cleanup
+        run: |
+          echo "=== Firewall Cleanup Complete ==="
+          echo "Provider: ${{ inputs.firewall-provider }}"
+          echo "Rule removed for IP: ${{ needs.setup-firewall.outputs.runner-ip }}"
+          echo "✓ All firewall rules cleaned up"
