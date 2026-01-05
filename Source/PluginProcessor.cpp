@@ -154,6 +154,12 @@ void MAEVNAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 void MAEVNAudioProcessor::releaseResources()
 {
     audioEngine.releaseResources();
+    
+    // Reset standalone initialization flag so next prepareToPlay will perform 3x recursion again
+    #if JucePlugin_Build_Standalone
+    isStandaloneInitialized = false;
+    prepareCallCount = 0;
+    #endif
 }
 
 bool MAEVNAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
