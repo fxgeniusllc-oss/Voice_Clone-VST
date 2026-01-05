@@ -405,9 +405,8 @@ def calculate_impact_score(module: str) -> float:
 Use build system to extract dependencies:
 
 ```bash
-# Extract #include directives
-grep -r "^#include" Source/ | \
-  grep -v "^//" | \
+# Extract #include directives (excluding commented lines)
+grep -rh "^[[:space:]]*#include" Source/ | \
   sed 's/.*#include.*[<"]\(.*\)[>"]/\1/' | \
   sort | uniq
 

@@ -132,7 +132,7 @@ sub-millisecond coordination operations.
 ## 📊 Documentation Statistics
 
 ### Size & Scope
-- **Total Files**: 20 files (16 base + 4 efficiency features)
+- **Total Files**: 20 CMI files (16 original from base system + 4 new efficiency features in v1.0)
 - **Total Lines**: ~8,300 lines of documentation
 - **Total Characters**: ~240,000 characters
 - **Topics Covered**: 50+ FAQ entries, 8 agent roles, 100+ checklist items
