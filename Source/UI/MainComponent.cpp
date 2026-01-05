@@ -38,6 +38,9 @@ MainComponent::MainComponent(MAEVNAudioProcessor& processor)
     setupSlider(vocalPitchSlider, vocalPitchLabel, "Pitch", "vocalPitch");
     setupSlider(vocalFormantSlider, vocalFormantLabel, "Formant", "vocalFormant");
     
+    // Voice model management
+    setupVoiceModelControls();
+    
     // FX controls
     setupSlider(reverbMixSlider, reverbLabel, "Reverb", "reverbMix");
     setupSlider(delayMixSlider, delayLabel, "Delay", "delayMix");
@@ -175,9 +178,25 @@ void MainComponent::resized()
     vocalBounds.reduce(10, 25);
     
     enableVocalsButton.setBounds(vocalBounds.removeFromTop(buttonHeight));
-    vocalBounds.removeFromTop(15);
+    vocalBounds.removeFromTop(10);
     
-    int knobSize = 80;
+    // Voice model controls
+    voiceModelLabel.setBounds(vocalBounds.removeFromTop(20));
+    vocalBounds.removeFromTop(2);
+    voiceModelSelector.setBounds(vocalBounds.removeFromTop(24));
+    vocalBounds.removeFromTop(5);
+    
+    auto buttonRow = vocalBounds.removeFromTop(28);
+    loadModelButton.setBounds(buttonRow.removeFromLeft(buttonRow.getWidth() / 2 - 2));
+    buttonRow.removeFromLeft(4);
+    cloneVoiceButton.setBounds(buttonRow);
+    vocalBounds.removeFromTop(5);
+    
+    modelStatusLabel.setBounds(vocalBounds.removeFromTop(20));
+    vocalBounds.removeFromTop(10);
+    
+    // Pitch and formant knobs
+    int knobSize = 70;
     auto vocalKnobBounds = vocalBounds.removeFromTop(knobSize + 40);
     vocalPitchSlider.setBounds(vocalKnobBounds.removeFromLeft(vocalKnobBounds.getWidth() / 2).withSizeKeepingCentre(knobSize, knobSize + 40));
     vocalFormantSlider.setBounds(vocalKnobBounds.withSizeKeepingCentre(knobSize, knobSize + 40));
@@ -204,3 +223,206 @@ void MainComponent::resized()
     masterGainSlider.setBounds(masterKnobBounds.removeFromLeft(masterKnobBounds.getWidth() / 2).withSizeKeepingCentre(knobSize, knobSize + 40));
     masterPanSlider.setBounds(masterKnobBounds.withSizeKeepingCentre(knobSize, knobSize + 40));
 }
+
+// Voice model management implementation
+void MainComponent::setupVoiceModelControls()
+{
+    // Voice model label
+    voiceModelLabel.setText("Voice Model:", juce::dontSendNotification);
+    voiceModelLabel.setJustificationType(juce::Justification::centredLeft);
+    addAndMakeVisible(voiceModelLabel);
+    
+    // Voice model selector
+    voiceModelSelector.setTextWhenNothingSelected("Select a voice model...");
+    voiceModelSelector.setTextWhenNoChoicesAvailable("No models available");
+    voiceModelSelector.onChange = [this]() { onVoiceModelSelected(); };
+    addAndMakeVisible(voiceModelSelector);
+    
+    // Load model button
+    loadModelButton.setButtonText("Load Model");
+    loadModelButton.setTooltip("Browse and load a custom voice model file");
+    loadModelButton.onClick = [this]() { onLoadModelButtonClicked(); };
+    addAndMakeVisible(loadModelButton);
+    
+    // Clone voice button
+    cloneVoiceButton.setButtonText("Clone Voice");
+    cloneVoiceButton.setTooltip("Record audio to create a new voice clone");
+    cloneVoiceButton.onClick = [this]() { onCloneVoiceButtonClicked(); };
+    addAndMakeVisible(cloneVoiceButton);
+    
+    // Model status label
+    modelStatusLabel.setText("Status: No model loaded", juce::dontSendNotification);
+    modelStatusLabel.setJustificationType(juce::Justification::centredLeft);
+    modelStatusLabel.setFont(juce::Font(12.0f));
+    modelStatusLabel.setColour(juce::Label::textColourId, juce::Colours::lightgrey);
+    addAndMakeVisible(modelStatusLabel);
+    
+    // Load available models
+    loadAvailableVoiceModels();
+}
+
+void MainComponent::loadAvailableVoiceModels()
+{
+    voiceModelSelector.clear(juce::dontSendNotification);
+    
+    // Add default/built-in models
+    voiceModelSelector.addItem("Default Voice (DSP Formant)", 1);
+    voiceModelSelector.addItem("Neural TTS Model", 2);
+    
+    // Scan Models/vocals directory for available models
+    juce::File modelsDir = juce::File::getCurrentWorkingDirectory().getChildFile("Models").getChildFile("vocals");
+    
+    if (modelsDir.exists() && modelsDir.isDirectory())
+    {
+        int itemId = 3;
+        auto files = modelsDir.findChildFiles(juce::File::findFiles, false, "*.onnx");
+        
+        for (const auto& file : files)
+        {
+            voiceModelSelector.addItem(file.getFileNameWithoutExtension(), itemId++);
+        }
+    }
+    
+    // Set default selection
+    voiceModelSelector.setSelectedId(1, juce::dontSendNotification);
+    updateModelStatus("Using default DSP formant synthesis");
+}
+
+void MainComponent::onLoadModelButtonClicked()
+{
+    // Create file chooser for loading ONNX models
+    auto chooser = std::make_unique<juce::FileChooser>(
+        "Select a voice model file",
+        juce::File::getCurrentWorkingDirectory().getChildFile("Models").getChildFile("vocals"),
+        "*.onnx"
+    );
+    
+    auto chooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles;
+    
+    chooser->launchAsync(chooserFlags, [this](const juce::FileChooser& fc)
+    {
+        auto file = fc.getResult();
+        
+        if (file.existsAsFile())
+        {
+            // Load TTS model
+            bool ttsLoaded = audioProcessor.getAudioEngine().getVocalSynthesis()
+                .loadTTSModel(file.getFullPathName());
+            
+            if (ttsLoaded)
+            {
+                // Try to find corresponding vocoder model
+                juce::File vocoderFile = file.getSiblingFile("vocals_hifigan.onnx");
+                if (vocoderFile.existsAsFile())
+                {
+                    audioProcessor.getAudioEngine().getVocalSynthesis()
+                        .loadVocoderModel(vocoderFile.getFullPathName());
+                }
+                
+                updateModelStatus("Loaded: " + file.getFileName());
+                
+                // Add to selector if not already present
+                bool alreadyPresent = false;
+                for (int i = 0; i < voiceModelSelector.getNumItems(); ++i)
+                {
+                    if (voiceModelSelector.getItemText(i) == file.getFileNameWithoutExtension())
+                    {
+                        alreadyPresent = true;
+                        voiceModelSelector.setSelectedItemIndex(i);
+                        break;
+                    }
+                }
+                
+                if (!alreadyPresent)
+                {
+                    int newId = voiceModelSelector.getNumItems() + 1;
+                    voiceModelSelector.addItem(file.getFileNameWithoutExtension(), newId);
+                    voiceModelSelector.setSelectedId(newId);
+                }
+            }
+            else
+            {
+                updateModelStatus("Failed to load model");
+                juce::AlertWindow::showMessageBoxAsync(
+                    juce::AlertWindow::WarningIcon,
+                    "Model Load Error",
+                    "Failed to load the voice model. Please check the file format.",
+                    "OK"
+                );
+            }
+        }
+    });
+}
+
+void MainComponent::onCloneVoiceButtonClicked()
+{
+    // Show dialog for voice cloning
+    juce::AlertWindow::showMessageBoxAsync(
+        juce::AlertWindow::InfoIcon,
+        "Voice Cloning",
+        "Voice cloning feature:\n\n"
+        "To clone a voice, you need to:\n"
+        "1. Record 5-10 minutes of clean audio samples\n"
+        "2. Use external voice cloning tools (RVC, So-VITS-SVC, etc.)\n"
+        "3. Export the trained model to ONNX format\n"
+        "4. Load the model using the 'Load Model' button\n\n"
+        "Quick clone from recording is a planned feature for future releases.\n\n"
+        "For now, you can:\n"
+        "• Use pre-trained models from Hugging Face\n"
+        "• Train models using TensorFlow/PyTorch\n"
+        "• Export to ONNX and load here",
+        "OK"
+    );
+}
+
+void MainComponent::onVoiceModelSelected()
+{
+    int selectedId = voiceModelSelector.getSelectedId();
+    juce::String selectedText = voiceModelSelector.getText();
+    
+    if (selectedId == 1)
+    {
+        // Default DSP formant synthesis
+        updateModelStatus("Using default DSP formant synthesis");
+    }
+    else if (selectedId == 2)
+    {
+        // Neural TTS model
+        juce::File ttsFile = juce::File::getCurrentWorkingDirectory()
+            .getChildFile("Models").getChildFile("vocals").getChildFile("vocals_tts.onnx");
+        juce::File vocoderFile = juce::File::getCurrentWorkingDirectory()
+            .getChildFile("Models").getChildFile("vocals").getChildFile("vocals_hifigan.onnx");
+        
+        if (ttsFile.existsAsFile() && vocoderFile.existsAsFile())
+        {
+            bool loaded = audioProcessor.getAudioEngine().getVocalSynthesis()
+                .loadTTSModel(ttsFile.getFullPathName());
+            loaded &= audioProcessor.getAudioEngine().getVocalSynthesis()
+                .loadVocoderModel(vocoderFile.getFullPathName());
+            
+            if (loaded)
+            {
+                updateModelStatus("Loaded: Neural TTS + HiFi-GAN");
+            }
+            else
+            {
+                updateModelStatus("Failed to load neural models");
+            }
+        }
+        else
+        {
+            updateModelStatus("Neural models not found - using DSP fallback");
+        }
+    }
+    else
+    {
+        // Custom model selected
+        updateModelStatus("Selected: " + selectedText);
+    }
+}
+
+void MainComponent::updateModelStatus(const juce::String& status)
+{
+    modelStatusLabel.setText("Status: " + status, juce::dontSendNotification);
+}
+

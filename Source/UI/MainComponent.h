@@ -39,6 +39,13 @@ private:
     juce::Label vocalPitchLabel;
     juce::Label vocalFormantLabel;
     
+    // Voice model management
+    juce::ComboBox voiceModelSelector;
+    juce::Label voiceModelLabel;
+    juce::TextButton loadModelButton;
+    juce::TextButton cloneVoiceButton;
+    juce::Label modelStatusLabel;
+    
     // FX controls
     juce::Slider reverbMixSlider;
     juce::Slider delayMixSlider;
@@ -73,6 +80,14 @@ private:
     
     void setupButton(juce::ToggleButton& button, const juce::String& text, const juce::String& paramID);
     void setupSlider(juce::Slider& slider, juce::Label& label, const juce::String& text, const juce::String& paramID);
+    
+    // Voice model management methods
+    void setupVoiceModelControls();
+    void loadAvailableVoiceModels();
+    void onLoadModelButtonClicked();
+    void onCloneVoiceButtonClicked();
+    void onVoiceModelSelected();
+    void updateModelStatus(const juce::String& status);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
