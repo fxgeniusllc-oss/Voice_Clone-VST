@@ -25,7 +25,8 @@ jobs:
         id: get-ip
         run: |
           # Get the public IP address of the GitHub Actions runner
-          RUNNER_IP=$(curl -s https://api.ipify.org)
+          # Try multiple services for reliability
+          RUNNER_IP=$(curl -s https://api.ipify.org || curl -s https://ifconfig.me || curl -s https://icanhazip.com)
           echo "Runner IP: $RUNNER_IP"
           echo "ip=$RUNNER_IP" >> $GITHUB_OUTPUT
 

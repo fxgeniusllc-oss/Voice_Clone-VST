@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       runner-ip: ${{ steps.get-ip.outputs.ip }}
-      rule-id: ${{ steps.create-rule.outputs.rule_id }}
+      rule-id: ${{ steps.configure-aws.outputs.rule_id || steps.configure-azure.outputs.rule_id || steps.configure-gcp.outputs.rule_id || steps.create-rule.outputs.rule_id }}
       timestamp: ${{ steps.timestamp.outputs.time }}
 
     steps:
@@ -66,12 +66,17 @@ jobs:
 
       - name: Configure AWS Security Group
         if: inputs.firewall-provider == 'aws'
+        id: configure-aws
         env:
           RUNNER_IP: ${{ steps.get-ip.outputs.ip }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_SECURITY_GROUP_ID: ${{ secrets.AWS_SECURITY_GROUP_ID }}
         run: |
           echo "=== Configuring AWS Security Group ==="
+
+          # Generate unique rule ID
+          RULE_ID="github-actions-${{ github.run_id }}-$(date +%s)"
+          echo "rule_id=$RULE_ID" >> $GITHUB_OUTPUT
 
           # Note: Requires AWS credentials to be configured
           # Add GitHub secrets: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, AWS_SECURITY_GROUP_ID
@@ -84,15 +89,21 @@ jobs:
 
           echo "Would configure AWS Security Group: $AWS_SECURITY_GROUP_ID"
           echo "Whitelist IP: $RUNNER_IP/32 for HTTPS (443)"
+          echo "Rule ID: $RULE_ID"
 
       - name: Configure Azure Network Security Group
         if: inputs.firewall-provider == 'azure'
+        id: configure-azure
         env:
           RUNNER_IP: ${{ steps.get-ip.outputs.ip }}
           AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
           AZURE_NSG_NAME: ${{ secrets.AZURE_NSG_NAME }}
         run: |
           echo "=== Configuring Azure Network Security Group ==="
+
+          # Generate unique rule ID
+          RULE_ID="GitHub-Actions-${{ github.run_id }}"
+          echo "rule_id=$RULE_ID" >> $GITHUB_OUTPUT
 
           # Note: Requires Azure credentials to be configured
           # Add GitHub secrets: AZURE_CREDENTIALS, AZURE_RESOURCE_GROUP, AZURE_NSG_NAME
@@ -111,15 +122,21 @@ jobs:
 
           echo "Would configure Azure NSG: $AZURE_NSG_NAME"
           echo "Whitelist IP: $RUNNER_IP/32 for HTTPS (443)"
+          echo "Rule ID: $RULE_ID"
 
       - name: Configure GCP Firewall Rule
         if: inputs.firewall-provider == 'gcp'
+        id: configure-gcp
         env:
           RUNNER_IP: ${{ steps.get-ip.outputs.ip }}
           GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
           GCP_NETWORK: ${{ secrets.GCP_NETWORK }}
         run: |
           echo "=== Configuring GCP Firewall Rule ==="
+
+          # Generate unique rule ID
+          RULE_ID="github-actions-${{ github.run_id }}"
+          echo "rule_id=$RULE_ID" >> $GITHUB_OUTPUT
 
           # Note: Requires GCP credentials to be configured
           # Add GitHub secrets: GCP_CREDENTIALS, GCP_PROJECT, GCP_NETWORK
@@ -135,6 +152,7 @@ jobs:
 
           echo "Would configure GCP Firewall: $GCP_NETWORK"
           echo "Whitelist IP: $RUNNER_IP/32 for HTTPS (443)"
+          echo "Rule ID: $RULE_ID"
 
       - name: Configure Custom Firewall
         if: inputs.firewall-provider == 'custom'
