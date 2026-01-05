@@ -64,7 +64,7 @@
 
 #### Timeline / DAW Arrangement
 - 🔲 Ensure plugin supports timeline event placement/edit for audio regions (user sample drag-drop scenarios).
-- 🔲 Multi-track region expands does export safe tested.
+- 🔲 Multi-track region expansion and export safety testing.
 
 **Testing Notes:**
 - Test script-based arrangement system
@@ -132,7 +132,7 @@
 - Monitor for deadlocks or hangs
 
 #### Build Scripts (Shell/Batchfile Scenarios)
-- 🔲 Validate various shell/batchfiles including CMake/bootstrap targets produce **consistent dependencies versions** across Operating system permutations. Recover temporary directory signs log persistence.
+- 🔲 Validate various shell/batch files including CMake/bootstrap targets produce **consistent dependency versions** across operating system permutations. Verify temporary directory cleanup and log persistence.
 
 **Testing Notes:**
 - Test `setup_maevn_repo.sh` and `.bat` on all platforms
@@ -149,7 +149,7 @@
 ### 3. Usability & User Testing
 
 #### Cross-Platform VST3 Validation
-- 🔲 Test plugin loading across industry-standard DAWs (Ableton Live, FL Studio, Logic Pro, and Reaper). Identify unsupported custom-cased exported.
+- 🔲 Test plugin loading across industry-standard DAWs (Ableton Live, FL Studio, Logic Pro, and Reaper). Identify unsupported custom cases and export issues.
 - 🔲 Extensive validation of GUI/UX interactions powered via JUCE — ensure sleek, intuitive operation for parameter controls (sliders, knobs, panels).
 
 **Testing Notes:**
@@ -181,7 +181,7 @@
 - Profile hot spots with perf/Instruments
 
 #### Localization and Documentation
-- 🔲 Review the localization where user-interacted controls perform differently non-defaulting shift while Guides, Checkups-align Nothing UI!!
+- 🔲 Review localization where user interface controls behave differently from default settings and ensure UI guides and checkups are properly aligned.
 
 **Testing Notes:**
 - Verify all UI text is clear and understandable
@@ -223,7 +223,7 @@
 - Validate installer scripts
 
 #### Edge Cases
-- 🔲 Confirm fallback behaviors when system/DAW-side cancellation (e.g., MIDI dropdown > Randomly multi-Assign not working across Resett).
+- 🔲 Confirm fallback behaviors when system/DAW-side cancellation occurs (e.g., MIDI dropdown issues, random multi-assignment failures, reset problems).
 
 **Testing Notes:**
 - Test plugin behavior with invalid MIDI input
