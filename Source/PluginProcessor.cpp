@@ -120,25 +120,20 @@ void MAEVNAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     // Check if we're running in standalone mode
     #if JucePlugin_Build_Standalone
-    // Perform 3x recursion for plugin readiness in standalone mode
+    // Perform 3 sequential prepare calls for plugin readiness in standalone mode
     if (!isStandaloneInitialized)
     {
-        // First prepare call
-        audioEngine.prepare(sampleRate, samplesPerBlock);
-        prepareCallCount++;
-        
-        // Second prepare call (recursion 1)
-        audioEngine.prepare(sampleRate, samplesPerBlock);
-        prepareCallCount++;
-        
-        // Third prepare call (recursion 2)
-        audioEngine.prepare(sampleRate, samplesPerBlock);
-        prepareCallCount++;
+        // Call prepare 3 times to ensure all resources are fully initialized
+        for (int i = 0; i < 3; ++i)
+        {
+            audioEngine.prepare(sampleRate, samplesPerBlock);
+            prepareCallCount++;
+        }
         
         isStandaloneInitialized = true;
         
-        juce::Logger::writeToLog("MAEVN Standalone: Plugin readiness initialized with 3x recursion (prepare called " 
-                                 + juce::String(prepareCallCount) + " times)");
+        juce::Logger::writeToLog("MAEVN Standalone: Plugin readiness initialized with " 
+                                 + juce::String(prepareCallCount) + " prepare calls");
     }
     else
     {
@@ -155,7 +150,7 @@ void MAEVNAudioProcessor::releaseResources()
 {
     audioEngine.releaseResources();
     
-    // Reset standalone initialization flag so next prepareToPlay will perform 3x recursion again
+    // Reset standalone initialization flag so next prepareToPlay will perform 3 prepare calls again
     #if JucePlugin_Build_Standalone
     isStandaloneInitialized = false;
     prepareCallCount = 0;
