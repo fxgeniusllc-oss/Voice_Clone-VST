@@ -11,6 +11,10 @@ env:
   BUILD_TYPE: Release
   JUCE_VERSION: 7.0.9
 
+permissions:
+  contents: read
+  actions: read
+
 jobs:
   # Pre-configuration job that sets up dynamic firewall rules
   configure-firewall:

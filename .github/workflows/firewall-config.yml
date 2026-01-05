@@ -22,6 +22,10 @@ on:
 env:
   BUILD_TYPE: Release
 
+permissions:
+  contents: read
+  actions: read
+
 jobs:
   # Job to dynamically configure firewall rules based on provider
   setup-firewall:
