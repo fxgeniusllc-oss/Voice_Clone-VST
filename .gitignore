@@ -115,6 +115,8 @@ wandb/
 # Jupyter Notebooks
 .ipynb_checkpoints/
 *.ipynb
+# Exception: Include the official Colab notebook
+!colab_maevn.ipynb
 
 # Package manager
 node_modules/
