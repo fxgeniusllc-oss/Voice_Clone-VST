@@ -44,6 +44,23 @@ MAEVN is a **JUCE-based VST3 plugin** with **ONNX Runtime integration**, bridgin
 3. Rescan plugins in your DAW
 4. Load MAEVN as an instrument
 
+### For Cloud Build (Google Colab)
+
+Build MAEVN in the cloud without installing anything locally:
+
+1. Open [`colab_maevn.ipynb`](colab_maevn.ipynb) in Google Colab
+2. Run all cells sequentially
+3. Download the compiled VST3 plugin
+4. Install on your local machine
+
+See [COLAB_GUIDE.md](COLAB_GUIDE.md) for detailed instructions.
+
+**Perfect for:**
+- Users without development environment
+- Testing before local installation
+- Cloud-based workflows
+- Quick builds without setup
+
 ### For Developers (Build from Source)
 
 ```bash
@@ -544,6 +561,7 @@ See [CMI/operational_ethics.md](CMI/operational_ethics.md) for complete guidelin
 
 - **[README.md](README.md)** — This file (overview and quick start)
 - **[BUILD.md](BUILD.md)** — Detailed build instructions for all platforms
+- **[COLAB_GUIDE.md](COLAB_GUIDE.md)** — Google Colab build and usage guide
 - **[ARCHITECTURE.md](ARCHITECTURE.md)** — System architecture and design
 - **[QUICKSTART.md](QUICKSTART.md)** — User quick start guide
 - **[LAUNCHER_GUIDE.md](LAUNCHER_GUIDE.md)** — Launcher and installation guide
