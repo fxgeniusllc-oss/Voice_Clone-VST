@@ -333,7 +333,7 @@ python3 scripts/export_vocal_models.py
 **Important Notes:**
 - The export scripts use **ONNX opset version 18** to support all required operators (LayerNormalization, etc.)
 - Ensure your ONNX Runtime version supports opset 18 (ONNX Runtime 1.12.0+)
-- Models are exported with dynamic batch size support using `dynamic_shapes=True`
+- Models are exported with static batch sizes optimized for inference
 - Exported models are saved to `Models/drums/`, `Models/instruments/`, and `Models/vocals/` directories
 
 **Troubleshooting Model Export:**
