@@ -331,7 +331,7 @@ python3 scripts/export_vocal_models.py
 ```
 
 **Important Notes:**
-- The export scripts use **ONNX opset version 18** for consistency and to support all required operators (layer normalization for drum/instrument models, batch normalization for vocal models)
+- The export scripts use **ONNX opset version 18** to support layer normalization (required for drum/instrument models) and for consistency across all models
 - Ensure your ONNX Runtime version supports opset 18 (ONNX Runtime 1.12.0+)
 - Models are exported with static batch sizes optimized for inference
 - Exported models are saved to `Models/drums/`, `Models/instruments/`, and `Models/vocals/` directories
