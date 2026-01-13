@@ -255,7 +255,7 @@ def export_tts_model(output_path):
         dummy_input,
         output_path,
         export_params=True,
-        opset_version=18,  # Use opset 18 for LayerNormalization support
+        opset_version=18,  # Use opset 18 for compatibility with latest ONNX features
         do_constant_folding=True,
         input_names=['phoneme_features'],
         output_names=['mel_spectrogram'],
@@ -288,7 +288,7 @@ def export_vocoder_model(output_path):
         dummy_input,
         output_path,
         export_params=True,
-        opset_version=18,  # Use opset 18 for LayerNormalization support
+        opset_version=18,  # Use opset 18 for compatibility with latest ONNX features
         do_constant_folding=True,
         input_names=['mel_spectrogram'],
         output_names=['audio_waveform'],
