@@ -81,7 +81,11 @@ if [ ! -d "${MODELS_DIR}" ]; then
     echo "[INFO] Models directory not found at: ${MODELS_DIR}"
     echo "       Running ./setup_maevn_repo.sh to create it..."
     echo
-    "${SCRIPT_DIR}/setup_maevn_repo.sh"
+    if ! "${SCRIPT_DIR}/setup_maevn_repo.sh"; then
+        echo "[ERROR] Failed to create Models directory structure"
+        echo "        Please run ./setup_maevn_repo.sh manually"
+        exit 1
+    fi
 fi
 
 # Check if ONNX models exist

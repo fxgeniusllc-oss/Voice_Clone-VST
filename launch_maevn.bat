@@ -61,6 +61,12 @@ if not exist "%SCRIPT_DIR%\Models" (
     echo        Running setup_maevn_repo.bat to create it...
     echo.
     call "%SCRIPT_DIR%\setup_maevn_repo.bat"
+    if errorlevel 1 (
+        echo [ERROR] Failed to create Models directory structure
+        echo         Please run setup_maevn_repo.bat manually
+        pause
+        exit /b 1
+    )
 )
 
 REM Check if ONNX models exist
