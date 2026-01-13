@@ -12,6 +12,9 @@ echo "========================================="
 echo "  MAEVN Standalone Launcher"
 echo "========================================="
 echo
+echo "MAEVN - AI-Powered Audio Synthesis"
+echo "Production-quality sounds with DSP and optional AI enhancement"
+echo
 
 # Detect platform
 PLATFORM="$(uname -s)"
@@ -75,14 +78,38 @@ echo
 # Check for Models directory
 MODELS_DIR="${SCRIPT_DIR}/Models"
 if [ ! -d "${MODELS_DIR}" ]; then
-    echo "[WARN] Models directory not found at: ${MODELS_DIR}"
-    echo "       AI features may not work. Run ./setup_maevn_repo.sh to create it."
+    echo "[INFO] Models directory not found at: ${MODELS_DIR}"
+    echo "       Running ./setup_maevn_repo.sh to create it..."
+    echo
+    if ! "${SCRIPT_DIR}/setup_maevn_repo.sh"; then
+        echo "[ERROR] Failed to create Models directory structure"
+        echo "        Please run ./setup_maevn_repo.sh manually"
+        exit 1
+    fi
+fi
+
+# Check if ONNX models exist
+if [ -d "${MODELS_DIR}" ]; then
+    ONNX_COUNT=$(find "${MODELS_DIR}" -name "*.onnx" 2>/dev/null | wc -l | tr -d ' ')
+else
+    ONNX_COUNT=0
+fi
+
+if [ "${ONNX_COUNT}" -eq 0 ]; then
+    echo "[INFO] No ONNX AI models found - using production-quality DSP synthesis"
+    echo "       This is normal and provides excellent sound quality."
+    echo "       ONNX models are optional enhancements."
+    echo
+else
+    echo "[OK] Found ${ONNX_COUNT} ONNX AI model(s) - AI-enhanced synthesis available"
     echo
 fi
 
 # Launch MAEVN
 echo "Launching MAEVN..."
 echo "========================================="
+echo
+echo "First time using MAEVN? See FIRST_USE.md for a quick guide."
 echo
 
 # Change to script directory so relative paths work

@@ -17,6 +17,8 @@ MAEVN is a **JUCE-based VST3 plugin** with **ONNX Runtime integration**, bridgin
 - 🎯 **Real-time Safe** — Audio processing optimized for <1ms per buffer
 - 🔌 **VST3 + Standalone** — Use in DAWs or run as standalone application
 
+**🎵 Sound Quality:** MAEVN delivers **production-quality audio** immediately after installation using advanced DSP synthesis. ONNX AI models are optional enhancements, not requirements. All instruments produce professional, industry-standard sounds out of the box.
+
 ## 📋 Table of Contents
 
 - [Quick Start](#-quick-start)
@@ -43,6 +45,9 @@ MAEVN is a **JUCE-based VST3 plugin** with **ONNX Runtime integration**, bridgin
    - **Linux:** `~/.vst3/`
 3. Rescan plugins in your DAW
 4. Load MAEVN as an instrument
+5. **Start making music!** All instruments work immediately with production-quality DSP synthesis
+
+**✅ No additional setup required** - MAEVN produces professional sounds out of the box.
 
 ### For Cloud Build (Google Colab)
 
@@ -71,20 +76,26 @@ cd Voice_Clone-VST
 # 2. Setup repository (creates Models directories)
 ./setup_maevn_repo.sh  # or setup_maevn_repo.bat on Windows
 
-# 3. Export default ONNX models (optional, requires Python 3.10+)
-./build_maevn_onnx.sh  # or build_maevn_onnx.bat on Windows
-
-# 4. Build plugin and standalone
+# 3. Build plugin and standalone
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 cmake --build . --config Release
 
-# 5. Install standalone app and VST3 plugin
+# 4. Install standalone app and VST3 plugin
 cd ..
 ./install_maevn.sh  # or install_maevn.bat on Windows
 
-# 6. Launch standalone (or use from DAW as VST3)
+# 5. Launch standalone (or use from DAW as VST3)
 ./launch_maevn.sh  # or launch_maevn.bat on Windows
+```
+
+**✅ Production-Ready Immediately:** After building, MAEVN includes production-quality DSP synthesis for all instruments. No ONNX models required!
+
+**Optional Enhancement (Advanced Users Only):**
+```bash
+# Step 3.5: Export AI enhancement models (requires Python 3.10+ and PyTorch)
+# Only needed if you want AI-powered synthesis instead of DSP
+./build_maevn_onnx.sh  # or build_maevn_onnx.bat on Windows
 ```
 
 See [BUILD.md](BUILD.md) for detailed build instructions.

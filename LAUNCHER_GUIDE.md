@@ -22,7 +22,7 @@ MAEVN provides several scripts to help you build, install, and launch the applic
 # 1. Setup repository
 ./setup_maevn_repo.sh  # Creates Models directories
 
-# 2. Build MAEVN
+# 2. Build MAEVN (includes production-quality DSP synthesis)
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 cmake --build . --config Release
@@ -31,9 +31,14 @@ cmake --build . --config Release
 cd ..
 ./install_maevn.sh  # Installs to system
 
-# 4. Launch
+# 4. Launch and start making music!
 ./launch_maevn.sh  # Run standalone
+
+# Optional: Add AI models (not required for production quality)
+# ./build_maevn_onnx.sh  # Requires Python 3.10+ and PyTorch
 ```
+
+**✅ After step 4, MAEVN is ready to produce professional sounds!**
 
 ## Launcher Scripts
 

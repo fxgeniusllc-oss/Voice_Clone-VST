@@ -105,6 +105,10 @@ echo =========================================
 echo.
 echo MAEVN has been installed to your system.
 echo.
+echo ✅ READY TO USE: MAEVN includes production-quality DSP synthesis
+echo    All instruments (808, hi-hat, snare, piano, synth) and vocals
+echo    work immediately with professional sound quality.
+echo.
 echo To launch MAEVN standalone:
 echo   - Search for 'MAEVN' in Start Menu
 echo   - Or run: %INSTALL_DIR%\MAEVN.exe
@@ -123,5 +127,9 @@ echo For documentation, see:
 echo   - README.md - Overview and features
 echo   - QUICKSTART.md - Quick start guide
 echo   - BUILD.md - Build instructions
+echo.
+echo OPTIONAL: To add AI-enhanced synthesis (advanced users):
+echo   Run: build_maevn_onnx.bat (requires Python 3.10+ and PyTorch)
+echo   This is NOT required - DSP mode is production-ready
 echo.
 pause

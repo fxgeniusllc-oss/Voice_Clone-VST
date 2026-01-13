@@ -23,14 +23,25 @@ See [BUILD.md](BUILD.md) for detailed build instructions.
 
 **Quick build and install:**
 ```bash
-# Build
+# 1. Setup repository structure
+./setup_maevn_repo.sh  # or setup_maevn_repo.bat on Windows
+
+# 2. Build MAEVN (produces fully functional plugin with DSP synthesis)
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 cmake --build . --config Release
 
-# Install (installs both VST3 and standalone)
+# 3. Install (installs both VST3 and standalone)
 cd ..
 ./install_maevn.sh  # or install_maevn.bat on Windows
+```
+
+**✅ Note:** MAEVN works immediately after installation with **production-quality DSP synthesis** for all instruments (808, hi-hat, snare, piano, synth) and vocals. ONNX AI models are **optional** enhancements.
+
+**Optional: Add AI Enhancement Models (Advanced)**
+```bash
+# Only if you want to use AI-powered synthesis instead of DSP
+./build_maevn_onnx.sh  # Requires Python 3.10+ and PyTorch
 ```
 
 ### 3. Using Standalone Mode (No DAW Required)
@@ -51,6 +62,12 @@ Or if you've installed it:
 - **Linux**: Launch from application menu or run `MAEVN`
 - **macOS**: Open from Applications folder
 - **Windows**: Launch from Start Menu
+
+**✅ Standalone mode is perfect for:**
+- Immediate use without a DAW
+- Testing and experimentation
+- Learning the interface
+- Creative sound design sessions
 
 ## First Use
 
@@ -78,11 +95,21 @@ Or if you've installed it:
 
 **Alternative:** Use MAEVN in Standalone mode (no DAW required)
 
-Launch MAEVN standalone using the launcher script or from your system's application menu. This mode is perfect for:
-- Quick experimentation
-- Use without a DAW
-- Learning the interface
-- Testing before integrating into your DAW workflow
+Launch MAEVN standalone using the launcher script or from your system's application menu. 
+
+**✅ Standalone First Use - Ready to Make Sound:**
+1. Launch MAEVN using the launcher script
+2. Enable one or more instruments (808, Hi-Hat, Snare, Piano, or Synth)
+3. Click on the interface or use your MIDI keyboard
+4. **Hear immediate, production-quality sounds** - no additional setup required!
+
+The standalone mode uses **professional DSP synthesis** that produces industry-quality sounds right out of the box. All trap instruments and vocal synthesis work immediately.
+
+**Sound Quality Modes:**
+- **DSP Mode (Default)**: Production-quality synthesis using advanced digital signal processing
+- **AI Mode (Optional)**: Enhanced AI-powered synthesis when ONNX models are loaded
+
+Both modes produce excellent, usable sounds for professional music production.
 
 ### Basic Configuration
 
@@ -201,9 +228,19 @@ Colors:
 
 ## AI Features (Advanced)
 
-To use AI-powered vocals and effects:
+**⚠️ Important:** This section is **OPTIONAL**. MAEVN works perfectly with built-in DSP synthesis and does not require ONNX models for production-quality sound.
 
-### 1. Obtain ONNX Models
+**When to use AI features:**
+- You want different timbral characteristics than the DSP synthesis provides
+- You have trained custom models for specific sounds
+- You're experimenting with neural audio synthesis
+
+**When NOT needed:**
+- First-time users - stick with DSP mode
+- Production work - DSP mode is production-ready
+- Simplicity - DSP mode requires no additional setup
+
+### 1. Obtain ONNX Models (Optional)
 
 You need three types of models:
 - **TTS Model**: Text-to-speech (text → mel-spectrogram)
