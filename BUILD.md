@@ -331,13 +331,13 @@ python3 scripts/export_vocal_models.py
 ```
 
 **Important Notes:**
-- The export scripts use **ONNX opset version 18** to support all required operators (layer normalization, etc.)
+- The export scripts use **ONNX opset version 18** for consistency and to support all required operators (layer normalization for drum/instrument models, batch normalization for vocal models)
 - Ensure your ONNX Runtime version supports opset 18 (ONNX Runtime 1.12.0+)
 - Models are exported with static batch sizes optimized for inference
 - Exported models are saved to `Models/drums/`, `Models/instruments/`, and `Models/vocals/` directories
 
 **Troubleshooting Model Export:**
-- If you encounter layer normalization errors, ensure you're using the latest version of PyTorch
+- If you encounter normalization layer errors, ensure you're using the latest version of PyTorch
 - For ONNX Runtime compatibility, download version 1.12.0 or later from the [ONNX Runtime releases page](https://github.com/microsoft/onnxruntime/releases)
 - To verify an exported model: `python3 -c "import onnx; onnx.checker.check_model('path/to/model.onnx')"`
 
