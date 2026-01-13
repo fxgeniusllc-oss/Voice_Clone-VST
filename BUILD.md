@@ -12,7 +12,8 @@ This guide provides detailed instructions for building the MAEVN VST3 plugin on 
 4. [macOS Build](#macos-build)
 5. [Linux Build](#linux-build)
 6. [ONNX Runtime Integration](#onnx-runtime-integration)
-7. [Troubleshooting](#troubleshooting)
+7. [Exporting ONNX Models](#exporting-onnx-models)
+8. [Troubleshooting](#troubleshooting)
 
 ## DAW Compatibility
 
@@ -298,6 +299,47 @@ ONNX Runtime is **optional**. Without it:
 - AI features will use DSP-based fallbacks
 - TTS/vocoder will use simple formant synthesis
 - AI effects will be bypassed
+
+### Exporting ONNX Models
+
+To export the AI models to ONNX format, use the provided export scripts:
+
+**Prerequisites:**
+- Python 3.10 or later
+- PyTorch (`pip install torch`)
+- ONNX (`pip install onnx`)
+
+**Export all models:**
+```bash
+# Linux/macOS
+./build_maevn_onnx.sh
+
+# Windows
+build_maevn_onnx.bat
+```
+
+**Export specific model types:**
+```bash
+# Drum synthesis models (808_ddsp, hihat_ddsp, snare_ddsp)
+python3 scripts/export_drum_models.py
+
+# Instrument synthesis models (piano_ddsp, synth_fm)
+python3 scripts/export_instrument_models.py
+
+# Vocal synthesis models (vocals_tts, vocals_hifigan)
+python3 scripts/export_vocal_models.py
+```
+
+**Important Notes:**
+- The export scripts use **ONNX opset version 18** to support all required operators (LayerNormalization, etc.)
+- Ensure your ONNX Runtime version supports opset 18 (ONNX Runtime 1.12.0+)
+- Models are exported with dynamic batch size support using `dynamic_shapes=True`
+- Exported models are saved to `Models/drums/`, `Models/instruments/`, and `Models/vocals/` directories
+
+**Troubleshooting Model Export:**
+- If you encounter LayerNormalization errors, ensure you're using the latest version of PyTorch
+- For ONNX Runtime compatibility, download version 1.12.0 or later from the [ONNX Runtime releases page](https://github.com/microsoft/onnxruntime/releases)
+- To verify an exported model: `python3 -c "import onnx; onnx.checker.check_model('path/to/model.onnx')"`
 
 ## Troubleshooting
 
