@@ -65,8 +65,10 @@ if not exist "%SCRIPT_DIR%\Models" (
 
 REM Check if ONNX models exist
 set ONNX_COUNT=0
-for /r "%SCRIPT_DIR%\Models" %%f in (*.onnx) do (
-    set /a ONNX_COUNT+=1
+if exist "%SCRIPT_DIR%\Models\" (
+    for /r "%SCRIPT_DIR%\Models" %%f in (*.onnx) do (
+        set /a ONNX_COUNT+=1
+    )
 )
 
 if %ONNX_COUNT% EQU 0 (

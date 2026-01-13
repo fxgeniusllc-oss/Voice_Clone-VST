@@ -85,8 +85,13 @@ if [ ! -d "${MODELS_DIR}" ]; then
 fi
 
 # Check if ONNX models exist
-ONNX_COUNT=$(find "${MODELS_DIR}" -name "*.onnx" 2>/dev/null | wc -l)
-if [ ${ONNX_COUNT} -eq 0 ]; then
+if [ -d "${MODELS_DIR}" ]; then
+    ONNX_COUNT=$(find "${MODELS_DIR}" -name "*.onnx" 2>/dev/null | wc -l | tr -d ' ')
+else
+    ONNX_COUNT=0
+fi
+
+if [ "${ONNX_COUNT}" -eq 0 ]; then
     echo "[INFO] No ONNX AI models found - using production-quality DSP synthesis"
     echo "       This is normal and provides excellent sound quality."
     echo "       ONNX models are optional enhancements."

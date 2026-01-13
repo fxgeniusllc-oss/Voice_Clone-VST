@@ -38,11 +38,14 @@ MAEVN supports two synthesis modes:
 ### Standalone Application
 
 1. **Launch MAEVN:**
-   ```bash
-   # Linux/macOS:
-   ./launch_maevn.sh
    
-   # Windows:
+   **Linux/macOS:**
+   ```bash
+   ./launch_maevn.sh
+   ```
+   
+   **Windows:**
+   ```batch
    launch_maevn.bat
    ```
 
