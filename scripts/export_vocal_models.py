@@ -255,14 +255,10 @@ def export_tts_model(output_path):
         dummy_input,
         output_path,
         export_params=True,
-        opset_version=15,
+        opset_version=18,  # Opset 18 for consistency (required for LayerNorm in other models)
         do_constant_folding=True,
         input_names=['phoneme_features'],
         output_names=['mel_spectrogram'],
-        dynamic_axes={
-            'phoneme_features': {0: 'batch_size'},
-            'mel_spectrogram': {0: 'batch_size'}
-        },
         verbose=False
     )
     
@@ -292,14 +288,10 @@ def export_vocoder_model(output_path):
         dummy_input,
         output_path,
         export_params=True,
-        opset_version=15,
+        opset_version=18,  # Opset 18 for consistency (required for LayerNorm in other models)
         do_constant_folding=True,
         input_names=['mel_spectrogram'],
         output_names=['audio_waveform'],
-        dynamic_axes={
-            'mel_spectrogram': {0: 'batch_size'},
-            'audio_waveform': {0: 'batch_size'}
-        },
         verbose=False
     )
     

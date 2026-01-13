@@ -135,14 +135,10 @@ def export_drum_model(model_name, output_path):
         dummy_input,
         output_path,
         export_params=True,
-        opset_version=15,  # Use newer opset for better optimization
+        opset_version=18,  # Use opset 18 for LayerNormalization support
         do_constant_folding=True,
         input_names=['control_params'],
         output_names=['audio_output'],
-        dynamic_axes={
-            'control_params': {0: 'batch_size'},
-            'audio_output': {0: 'batch_size'}
-        },
         verbose=False
     )
     
