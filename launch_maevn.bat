@@ -8,6 +8,9 @@ echo =========================================
 echo   MAEVN Standalone Launcher
 echo =========================================
 echo.
+echo MAEVN - AI-Powered Audio Synthesis
+echo Production-quality sounds with DSP and optional AI enhancement
+echo.
 
 REM Get script directory
 set "SCRIPT_DIR=%~dp0"
@@ -54,14 +57,33 @@ echo.
 
 REM Check for Models directory
 if not exist "%SCRIPT_DIR%\Models" (
-    echo [WARN] Models directory not found at: %SCRIPT_DIR%\Models
-    echo        AI features may not work. Run setup_maevn_repo.bat to create it.
+    echo [INFO] Models directory not found at: %SCRIPT_DIR%\Models
+    echo        Running setup_maevn_repo.bat to create it...
+    echo.
+    call "%SCRIPT_DIR%\setup_maevn_repo.bat"
+)
+
+REM Check if ONNX models exist
+set ONNX_COUNT=0
+for %%f in ("%SCRIPT_DIR%\Models\*.onnx" "%SCRIPT_DIR%\Models\drums\*.onnx" "%SCRIPT_DIR%\Models\instruments\*.onnx" "%SCRIPT_DIR%\Models\vocals\*.onnx") do (
+    if exist "%%f" set /a ONNX_COUNT+=1
+)
+
+if %ONNX_COUNT% EQU 0 (
+    echo [INFO] No ONNX AI models found - using production-quality DSP synthesis
+    echo        This is normal and provides excellent sound quality.
+    echo        ONNX models are optional enhancements.
+    echo.
+) else (
+    echo [OK] Found ONNX AI models - AI-enhanced synthesis available
     echo.
 )
 
 REM Launch MAEVN
 echo Launching MAEVN...
 echo =========================================
+echo.
+echo First time using MAEVN? See FIRST_USE.md for a quick guide.
 echo.
 
 REM Change to script directory so relative paths work
